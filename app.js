@@ -38,7 +38,9 @@ Ext.define('Ext.data.ConnectionEx', {
     if(this.hasListener('progress')) {
       this.getXhrInstance = function () {
         var xhr = origXhr.apply(me);
-        xhr.upload.addEventListener('progress', function (evt) {
+
+        xhr.addEventListener('progress', function (evt) {
+          console.log("xhr.progress");
           me.fireEvent('progress');
         }, false);
 
@@ -46,7 +48,7 @@ Ext.define('Ext.data.ConnectionEx', {
       };
     }
 
-    this.callParent(options);
+    this.callParent(arguments);
   }
 });
            
@@ -109,7 +111,7 @@ Ext.define('FileItem', {
     me.name = name;
     me.size = size;
 
-    me.callParent(config);
+    me.callParent([config]);
   },
   initComponent: function () {
     var me = this;
@@ -171,17 +173,20 @@ Ext.define('FileUploader', {
                   onload: function(evt) {
                     var conn = Ext.create('Ext.data.ConnectionEx');
                     conn.on('progress', function () {
-                      console.log('xhr progress.');
+                      console.log('connection progress.');
                     });
 
                     conn.request({
                       params: { 
                         name: file.get('name'),
                         size: file.get('size'),
-                        data: fr.request 
+                        data: fr.result
                       },
                       url: 'upload.php',
-                      method: 'POST'
+                      method: 'POST',
+                      success: function(response) {
+                        console.log("file uploaded");
+                      }
                     });
                     
                     // should be done on success
@@ -193,7 +198,7 @@ Ext.define('FileUploader', {
                   }
                 });
                 
-                fr.readAsBinaryString(file.file);
+                fr.readAsText(file.file, "UTF-8");
               }
               else {
                 console.log(file.get('name') + " not dirty.");
@@ -255,7 +260,7 @@ Ext.define('FileUploader', {
       }, me);
     };
 
-    this.callParent(config);
+    this.callParent([config]);
   },
   initComponent: function() {
     console.log("initComponent 2");
@@ -267,12 +272,11 @@ Ext.define('FileUploader', {
 Ext.onReady(function() {
   var mgr = Ext.create('FileManager');
   Ext.create('Ext.container.Container', {
-    html: 'A container',
     renderTo: Ext.getBody(),
-    width: 300,
-    height: 200,
-    style: { background: "#eee" },
     layout: 'fit',
+    width: 300,
+    height: 300,
+    style: { background: "#eee" },
     items: [Ext.create('FileUploader', mgr, {
       width: 300,
       height: 100,
