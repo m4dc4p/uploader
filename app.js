@@ -39,11 +39,27 @@ Ext.define('Ext.data.ConnectionEx', {
       this.getXhrInstance = function () {
         var xhr = origXhr.apply(me);
 
-        xhr.addEventListener('progress', function (evt) {
-          console.log("xhr.progress");
-          me.fireEvent('progress');
-        }, false);
+        if(xhr.upload)
+          xhr.upload.addEventListener('progress', function (evt) {
+            console.log("xhr.upload.progress");
+            me.fireEvent('progress', { 
+              request: 
+              dir: 'up',
+              amt: evt.loaded,
+              total: evt.lengthComputable ? evt.total : null 
+            });
+          }, false);
 
+        if(xhr.onprogress)
+          xhr.addEventListener('progress', function (evt) {
+            console.log("xhr.progress");
+            me.fireEvent('progress', { 
+              dir: 'down',
+              amt: evt.loaded,
+              total: evt.lengthComputable ? evt.total : null 
+            });
+          }, false);
+        
         return xhr;
       };
     }
@@ -53,11 +69,16 @@ Ext.define('Ext.data.ConnectionEx', {
 });
            
 Ext.define('FileManager', {
+  mixins: [
+    'Ext.util.Observable'
+  ],
   constructor: function () {
     var me = this,
     fs = Ext.create('Ext.data.Store', {
       model: 'File'
     });
+
+    me.addEvents('fileadded', 'fileremoved');
     
     (function () { 
       Ext.apply(me, {
@@ -73,6 +94,8 @@ Ext.define('FileManager', {
             rec.setId(id);
             rec.file = file;
           });
+
+          me.fireEvent('fileadded', file);
           
           return id;
         },
@@ -80,8 +103,10 @@ Ext.define('FileManager', {
         // anything else.
         removeFile: function (file) {
           var idx = fs.findBy(function (rec, id) { return rec.file === file;} );
-          if(idx >= 0)
+          if(idx >= 0) {
             fs.removeAt(idx);
+            me.fireEvent('fileremoved', file);
+          }
         },
         // Applies the function given to all
         // File records managed by this object.
@@ -99,7 +124,7 @@ Ext.define('FileManager', {
 Ext.define('FileItem', {
   extend: 'Ext.container.Container',
   config: { 
-    itemTpl: Ext.core.DomHelper.createTemplate('{name} ({size} bytes)') 
+    itemTpl: Ext.core.DomHelper.createTemplate('{name} ({size} bytes <span class="progress"></span>)') 
   },
   constructor: function(name, size, config) {
     var me = this;
@@ -140,23 +165,91 @@ Ext.define('FileItem', {
 });
 
 Ext.define('FileUploader', {
+  config: {
+    url: "upload.php",
+    method: "POST"
+  },
+  connection: null,
+  constructor: function (fileMgr, config) {
+    var me = this,
+    conn = Ext.create('Ext.data.ConnectionEx');
+
+    this.initConfig(config);
+    this.connection = conn;
+
+    this.callParent(arguments);
+    // Uploads each file as defined by the
+    // function given. Fn takes a File object,
+    // request parameters, and a upload callback. It should
+    // call the upload callback with a final request that will
+    // be given to the Connection.request method. Fn does
+    // not have to call the upload call back. 
+    this.uploadAs = function(fn) {
+      fileMgr.each(function(file)  {
+        var defaults = Ext.apply({
+          params: {
+            name: file.name,
+            size: file.size
+          }}, { url: me.getUrl() });
+
+        fn(file, defaults, function (req) {
+          conn.request(req);
+        });
+      });
+    };
+
+    // Upload all files.
+    this.uploadAll = function () {
+      me.uploadAs(function(defaults, uploader) {
+        var fr;
+        if(file.dirty || file.phantom) {
+          fr = new FileReader();
+          Ext.apply(fr, {
+            onload: function(evt) {
+              uploader(Ext.merge(params: { // add file data to the request
+                data: fr.result
+              }, Ext.apply(defaults, { // merge custom stuff over defaults
+                success: function(response) {
+                  console.log("file uploaded");
+                },
+                url: "upload.php",
+                method: "POST"
+              })));
+            },
+            onerror: function() {
+              console.log("Error reading: " + file.get('name'));
+            }
+          });
+          
+          fr.readAsText(file.file, "UTF-8");
+        }
+        else {
+          console.log(file.get('name') + " not dirty.");
+        }
+      });
+    };
+  }
+});
+
+Ext.define('UglyFileUploader', {
   extend: 'Ext.container.Container',
   constructor: function(fileMgr, config) {
     var listContainer,
-    me = this;
+    me = this,
+    fileItems = { },
+    uploader = Ext.create('FileUploader', fileMgr);
 
     this.initConfig(config);
 
-    this.addFile = function (file) {
-      fileMgr.addFile(file);
+    fileMgr.on('fileadded', function(file) {
       var item = Ext.create('FileItem', file.name, file.size);
+
       item.on('remove', function () {
         listContainer.remove(item);
-        fileMgr.removeFile(file);
       });
 
       listContainer.add(item);
-    };
+    }, this);
 
     this.privateInit = function() {
       me.insert(0, {
@@ -165,45 +258,12 @@ Ext.define('FileUploader', {
         text: 'Upload Files',
         listeners: {
           click: function() {
-            fileMgr.each(function(file) {
-              var fr;
-              if(file.dirty || file.phantom) {
-                fr = new FileReader();
-                Ext.apply(fr, {
-                  onload: function(evt) {
-                    var conn = Ext.create('Ext.data.ConnectionEx');
-                    conn.on('progress', function () {
-                      console.log('connection progress.');
-                    });
+            // need to get individual file in the progress event.
+            uploader.connection.on('progress', function (info) {
+              console.log('connection progress.');
+            });
 
-                    conn.request({
-                      params: { 
-                        name: file.get('name'),
-                        size: file.get('size'),
-                        data: fr.result
-                      },
-                      url: 'upload.php',
-                      method: 'POST',
-                      success: function(response) {
-                        console.log("file uploaded");
-                      }
-                    });
-                    
-                    // should be done on success
-                    // file.set('data', 1);
-                    // file.save();
-                  },
-                  onerror: function() {
-                    console.log("Error reading: " + file.get('name'));
-                  }
-                });
-                
-                fr.readAsText(file.file, "UTF-8");
-              }
-              else {
-                console.log(file.get('name') + " not dirty.");
-              }
-            }, me);
+            uploader.uploadAll();
           }
         }
       });
@@ -229,7 +289,7 @@ Ext.define('FileUploader', {
           listeners: {
             change: function(field, value, opt) {
               var files = me.down('filefield[name="filepicker"]').fileInputEl.dom.files;
-              Ext.Array.each(files, me.addFile, me);
+              Ext.Array.each(files, fileMgr.addFile, fileMgr);
             }
           }
         }]
@@ -270,14 +330,16 @@ Ext.define('FileUploader', {
 });
 
 Ext.onReady(function() {
+  
   var mgr = Ext.create('FileManager');
+
   Ext.create('Ext.container.Container', {
     renderTo: Ext.getBody(),
     layout: 'fit',
     width: 300,
     height: 300,
     style: { background: "#eee" },
-    items: [Ext.create('FileUploader', mgr, {
+    items: [Ext.create('UglyFileUploader', mgr, {
       width: 300,
       height: 100,
       layout: Ext.create('Ext.layout.container.VBox', {align: 'stretch'})
