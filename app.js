@@ -1,6 +1,7 @@
 Ext.Loader.setConfig({
   enabled: true,
-  paths: {'Cs': 'src'}
+  paths: {'Cs': 'src'},
+  disableCaching: false
 });
 
 Ext.require(['Cs.file.data.FileManager',

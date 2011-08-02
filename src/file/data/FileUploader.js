@@ -11,7 +11,17 @@ Ext.define('Cs.file.data.FileUploader', {
   constructor: function (fileMgr, config) {
     var me = this,
     conn = Ext.create('Cs.file.data.ConnectionEx'),
+    withForm = function(file, defaults, uploader) {
+      // Upload a file represented by a form.
+      uploader(Ext.apply(defaults, {
+        success: function(response) {
+          console.log("form uploaded.");
+          file.commit();
+        }
+      }));
+    },
     withFileReader = function(file, defaults, uploader) {
+      // Upload a file represented by a File object.
       var fr;
       if(file.dirty || file.phantom) {
         fr = new FileReader();
@@ -26,6 +36,7 @@ Ext.define('Cs.file.data.FileUploader', {
                 }}, Ext.apply(defaults, { // merge custom stuff over defaults
                   success: function(response) {
                     console.log("file uploaded");
+                    file.commit();
                   },
                   url: "upload.php",
                   method: "POST"
@@ -33,10 +44,13 @@ Ext.define('Cs.file.data.FileUploader', {
           },
           onerror: function() {
             console.log("Error reading: " + file.get('name'));
+          },
+          onabort: function() {
+            console.log("Error reading: " + file.get('name'));
           }
         });
         
-        fr.readAsText(file.file, "UTF-8");
+        fr.readAsBinaryString(file.raw);
       }
       else {
         console.log(file.get('name') + " not dirty.");
@@ -52,12 +66,17 @@ Ext.define('Cs.file.data.FileUploader', {
       fileMgr.each(function(file)  {
         var defaults = Ext.apply({
           params: {
-            name: file.name,
-            size: file.size
+            name: file.get('name'),
+            size: file.get('size')
           }}, { url: me.getUrl() });
 
         fn(file, defaults, function (req) {
-          conn.request(req);
+          if(file.get('type') == Cs.file.data.File.FILE)
+            conn.request(req);
+          else if(file.get('type') == Cs.file.data.File.FORM) {
+            var form = file.raw.up('form');
+            conn.upload(form, req.url, null, req);
+          }
         });
       });
     };
@@ -72,7 +91,12 @@ Ext.define('Cs.file.data.FileUploader', {
       var complete = Ext.emptyFn,
       error = Ext.emptyFn;
       
-      uploadAs();
+      uploadAs(function (file, defaults, uploader) {
+        if(file.get('type') === Cs.file.data.File.FILE)
+          withFileReader(file, defaults, uploader);
+        else if(file.get('type') === Cs.file.data.File.FORM)
+          withForm(file, defaults, uploader);
+      });
     };
   }
 });

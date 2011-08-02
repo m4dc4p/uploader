@@ -6,7 +6,7 @@ Ext.require([
 Ext.define('Cs.file.ui.FileItem', {
   extend: 'Ext.container.Container',
   config: { 
-    itemTpl: Ext.core.DomHelper.createTemplate('{name} ({size} bytes <span class="progress"></span>)') 
+    itemTpl: Ext.core.DomHelper.createTemplate('{name} ({size} bytes) <span class="progress"></span>') 
   },
   constructor: function(name, size, config) {
     var me = this;

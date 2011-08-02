@@ -14,8 +14,8 @@ Ext.define('Cs.file.ui.UglyFileUploader', {
 
     this.initConfig(config);
 
-    fileMgr.on('fileadded', function(file) {
-      var item = Ext.create('Cs.file.ui.FileItem', file.name, file.size);
+    fileMgr.on('fileadded', function(record) {
+      var item = Ext.create('Cs.file.ui.FileItem', record.get('name'), record.get('size'));
 
       item.on('remove', function () {
         listContainer.remove(item);
@@ -59,10 +59,19 @@ Ext.define('Cs.file.ui.UglyFileUploader', {
           width: 80,
           buttonText: "Add a File ...",
           buttonOnly: true,
+          multiple: true,
           listeners: {
             change: function(field, value, opt) {
-              var files = me.down('filefield[name="filepicker"]').fileInputEl.dom.files;
-              Ext.Array.each(files, fileMgr.addFile, fileMgr);
+              var inputEl = me.down('filefield[name="filepicker"]').fileInputEl;
+              if(inputEl.dom.files) {
+                var files = me.down('filefield[name="filepicker"]').fileInputEl.dom.files;
+                Ext.Array.each(files, fileMgr.addFile, fileMgr);
+              }
+              else if(inputEl.getValue()) {
+                fileMgr.addFile(inputEl);
+              }
+              else
+                throw "Unsupported file input type.";
             }
           }
         }]
@@ -86,7 +95,7 @@ Ext.define('Cs.file.ui.UglyFileUploader', {
           evt.preventDefault(); 
 
           Ext.Array.each(evt.dataTransfer.files, function(file) { 
-            me.addFile(file);
+            fileMgr.addFile(file);
           });
 
         }, false);
