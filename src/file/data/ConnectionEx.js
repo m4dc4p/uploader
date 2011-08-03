@@ -23,7 +23,8 @@ Ext.define('Cs.file.data.ConnectionEx', {
             me.fireEvent('progress', { 
               dir: 'up',
               amt: evt.loaded,
-              total: evt.lengthComputable ? evt.total : null 
+              total: evt.lengthComputable ? evt.total : null,
+              evt: evt
             });
           }, false);
 
@@ -33,7 +34,8 @@ Ext.define('Cs.file.data.ConnectionEx', {
             me.fireEvent('progress', { 
               dir: 'down',
               amt: evt.loaded,
-              total: evt.lengthComputable ? evt.total : null 
+              total: evt.lengthComputable ? evt.total : null,
+              evt: evt
             });
           }, false);
         
