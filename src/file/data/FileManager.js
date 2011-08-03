@@ -20,18 +20,20 @@ Ext.define('Cs.file.data.FileManager', {
     // file argument should be an actual File object,
     // as defined by Firefox and Webkit.
     this.addFile = function (file, form) {
-      var id;
+      var id, afterCreate = function (rec) { 
+        id = fs.getCount() * -1;
+        rec.setId(id);
+        rec.phantom = false;
+        rec.raw = file;
+      };
+
       if(typeof file.getAsText != "undefined") {
         // file is a File object.
         Ext.Array.each(fs.add({ 
           name: file.name,
           size: file.size,
           type: Cs.file.data.File.FILE
-        }), function (rec) { 
-          id = fs.getCount() * -1;
-          rec.setId(id);
-          rec.raw = file;
-        });
+        }), afterCreate);
         
         console.log("added: " + file.name);
       }
@@ -41,11 +43,7 @@ Ext.define('Cs.file.data.FileManager', {
           name: file.getValue(),
           size: -1,
           type: Cs.file.data.File.FORM
-        }), function (rec) { 
-          id = fs.getCount() * -1;
-          rec.setId(id);
-          rec.raw = file;
-        });
+        }), afterCreate);
       }
       else
         throw "Unrecognized file type.";

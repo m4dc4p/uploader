@@ -11,7 +11,20 @@ Ext.define('Cs.file.ui.UglyFileUploader', {
     me = this,
     fileItems = { },
     form,
-    uploader = Ext.create('Cs.file.data.FileUploader', fileMgr);
+    uploader = Ext.create('Cs.file.data.FileUploader', fileMgr, {
+      url: "upload.php",
+      progress: function(file, total, amt, evt) { 
+        console.log("Uploaded " + Ext.Number.toFixed(100 * amt / total, 2) + " of " + file.get('name'));
+      },  
+      success: function(file, response, options) { 
+        console.log("Successfully uploaded " + file.get('name'));
+      },
+      failure: function(file, response, options) {
+        console.log("Failed to upload " + file.get('name'));
+      },
+      callback: function(file, options, success, response) {
+        console.log("Callback for " + file.get('name'));
+      }});
 
     this.initConfig(config);
 
@@ -27,18 +40,15 @@ Ext.define('Cs.file.ui.UglyFileUploader', {
     }, this);
 
     this.privateInit = function() {
+      var count = 1;
+
       me.insert(0, {
         xtype: 'button',
         height: 20,
         text: 'Upload Files',
         listeners: {
           click: function() {
-              // need to get individual file in the progress event.
-            uploader.connection.on('progress', function (info) {
-              console.log('connection progress.');
-            });
-            
-            uploader.uploadAll();
+            uploader.upload();
           }
         }
       });
@@ -59,20 +69,24 @@ Ext.define('Cs.file.ui.UglyFileUploader', {
           xtype: "filefield",
           name: "filepicker",
           width: 80,
-          buttonText: "Add a File ...",
+          buttonText: "Add a File ... (" + count + ")",
           buttonOnly: true,
           multiple: true,
           listeners: {
             change: function(field, value, opt) {
-              var inputCmp = me.down('filefield[name="filepicker"]'),
-              inputEl = inputCmp.fileInputEl;
+              var inputCnt = field.ownerCt,
+              inputEl = field.fileInputEl;
 
               if(inputEl.dom.files) {
-                var files = me.down('filefield[name="filepicker"]').fileInputEl.dom.files;
-                Ext.Array.each(files, fileMgr.addFile, fileMgr);
+                Ext.Array.each(inputEl.dom.files, fileMgr.addFile, fileMgr);
               }
               else if(inputEl.getValue()) {
-                fileMgr.addFile(inputCmp);
+                fileMgr.addFile(field);
+                
+                count = count + 1;
+
+                inputCnt.add(field.cloneConfig({buttonText: "Add a File ... (" + count + ")"}));
+                field.setVisible(false);
               }
               else
                 throw "Unsupported file input type.";
