@@ -10,6 +10,7 @@ Ext.define('Cs.file.ui.UglyFileUploader', {
     var listContainer,
     me = this,
     fileItems = { },
+    form,
     uploader = Ext.create('Cs.file.data.FileUploader', fileMgr);
 
     this.initConfig(config);
@@ -18,6 +19,7 @@ Ext.define('Cs.file.ui.UglyFileUploader', {
       var item = Ext.create('Cs.file.ui.FileItem', record.get('name'), record.get('size'));
 
       item.on('remove', function () {
+        fileMgr.removeFile(record);
         listContainer.remove(item);
       });
 
@@ -31,11 +33,11 @@ Ext.define('Cs.file.ui.UglyFileUploader', {
         text: 'Upload Files',
         listeners: {
           click: function() {
-            // need to get individual file in the progress event.
+              // need to get individual file in the progress event.
             uploader.connection.on('progress', function (info) {
               console.log('connection progress.');
             });
-
+            
             uploader.uploadAll();
           }
         }
@@ -49,7 +51,7 @@ Ext.define('Cs.file.ui.UglyFileUploader', {
         layout: {type: "vbox", align: "stretch"}
       });
 
-      me.insert(0, {
+      form = me.insert(0, {
         xtype: "container",
         width: "100%",
         layout: {type: "hbox", pack: "end"},
@@ -62,13 +64,15 @@ Ext.define('Cs.file.ui.UglyFileUploader', {
           multiple: true,
           listeners: {
             change: function(field, value, opt) {
-              var inputEl = me.down('filefield[name="filepicker"]').fileInputEl;
+              var inputCmp = me.down('filefield[name="filepicker"]'),
+              inputEl = inputCmp.fileInputEl;
+
               if(inputEl.dom.files) {
                 var files = me.down('filefield[name="filepicker"]').fileInputEl.dom.files;
                 Ext.Array.each(files, fileMgr.addFile, fileMgr);
               }
               else if(inputEl.getValue()) {
-                fileMgr.addFile(inputEl);
+                fileMgr.addFile(inputCmp);
               }
               else
                 throw "Unsupported file input type.";

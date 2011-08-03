@@ -1,4 +1,5 @@
 Ext.require([
+  'Ext.form.Panel',
   'Cs.file.data.ConnectionEx'
 ]);
 
@@ -71,10 +72,16 @@ Ext.define('Cs.file.data.FileUploader', {
           }}, { url: me.getUrl() });
 
         fn(file, defaults, function (req) {
+          var form;
+
           if(file.get('type') == Cs.file.data.File.FILE)
             conn.request(req);
           else if(file.get('type') == Cs.file.data.File.FORM) {
-            var form = file.raw.up('form');
+            form = Ext.create('Ext.form.Panel', {
+              url: req.url,
+              items: [file.raw]
+            });
+
             conn.upload(form, req.url, null, req);
           }
         });

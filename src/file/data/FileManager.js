@@ -19,7 +19,7 @@ Ext.define('Cs.file.data.FileManager', {
     // Add a file to the file manager. The 
     // file argument should be an actual File object,
     // as defined by Firefox and Webkit.
-    this.addFile = function (file) {
+    this.addFile = function (file, form) {
       var id;
       if(typeof file.getAsText != "undefined") {
         // file is a File object.
@@ -35,7 +35,7 @@ Ext.define('Cs.file.data.FileManager', {
         
         console.log("added: " + file.name);
       }
-      else if(typeof file.dom != "undefined") {
+      else if(typeof file.fileInputEl != "undefined") {
         // file is a form Ext.Element
         Ext.Array.each(fs.add({ 
           name: file.getValue(),
@@ -54,10 +54,9 @@ Ext.define('Cs.file.data.FileManager', {
       return id;
     };
 
-    // file is the actual file or form object  here, not the name or
-    // anything else.    
+    // fileId is id associated with the file to remove.
     this.removeFile = function (file) {
-      var idx = fs.findBy(function (rec, id) { return rec.file === file;} );
+      var idx = fs.findBy(function(record) { return record.getId() === file.getId(); });
       if(idx >= 0) {
         fs.removeAt(idx);
         me.fireEvent('fileremoved', file);
@@ -65,7 +64,7 @@ Ext.define('Cs.file.data.FileManager', {
     };
 
     // Applies the function given to all
-    // File records managed by this object.    this.each = 
+    // File records managed by this object.    
     this.each = function (fn, scope) {
       fs.each(function(record) { 
         return fn.call(scope || me, record);
