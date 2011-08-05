@@ -6,11 +6,16 @@ Ext.require([
 
 Ext.define('Cs.file.ui.UglyFileUploader', {
   extend: 'Ext.container.Container',
-  constructor: function(fileMgr, config) {
+  alias: 'widget.uglyfileuploader',
+  config: {
+    mgr: null
+  },
+  constructor: function(config) {
     var listContainer,
     me = this,
     fileItems = { },
     form,
+    fileMgr = config["mgr"] || null,
     uploader = Ext.create('Cs.file.data.FileUploader', fileMgr, {
       url: "upload.php",
       progress: function(file, total, amt, evt) { 
@@ -123,7 +128,6 @@ Ext.define('Cs.file.ui.UglyFileUploader', {
     this.callParent([config]);
   },
   initComponent: function() {
-    console.log("initComponent 2");
     this.callParent();
     this.privateInit();
   }

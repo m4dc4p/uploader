@@ -14,14 +14,16 @@ Ext.onReady(function() {
 
   Ext.create('Ext.container.Container', {
     renderTo: Ext.getBody(),
-    layout: 'fit',
+    layout: {type: 'vbox', align: 'stretch' },
     width: 300,
     height: 300,
     style: { background: "#eee" },
-    items: [Ext.create('Cs.file.ui.UglyFileUploader', mgr, {
+    items: [{ 
+      xtype: 'uglyfileuploader', 
+      mgr: mgr, 
       width: 300,
       height: 100,
       layout: Ext.create('Ext.layout.container.VBox', {align: 'stretch'})
-    })]
+    }]
   });
 });
