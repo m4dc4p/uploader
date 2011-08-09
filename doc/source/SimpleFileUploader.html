@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.require([
+  'Ext.container.Container',
+  'Cs.file.data.FileUploader',
+  'Cs.file.data.FileManager',
+]);
+
+/* A simple UI for file uploading that shows a &quot;Browse&quot;
+   button. Will also allow file(s) to be dropped on
+   the container. */
+Ext.define('Cs.file.ui.SimpleFileUploader', {
+  extend: 'Ext.container.Container',
+  // config: {
+  //   url: null,
+  //   uploadWith: null,
+  //   layout: Ext.create('Ext.layout.container.VBox', { align: 'stretch' })
+  // },
+  alias: 'widget.simplefileuploader',
+  constructor: function(config) {
+    this.initConfig(config);
+    this.fileMgr = Ext.create('Cs.file.data.FileManager');
+
+    this.onFileChanged = function(field, value, opt) {
+
+    };
+
+    this.supportsFileDnD = typeof window[&quot;File&quot;] != &quot;undefined&quot;;
+    
+    this.callParent(arguments);
+  },
+  initComponent: function () {
+    var me = this;
+
+    this.callParent(arguments);
+
+    this.on('afterrender', function(c, opt) {
+      var myEl = me.getEl(),
+      msgCmp,
+      fileCmp,
+      fileCmpDef = {
+        xtype: 'filefield',
+        width: 100,
+        height: 30,
+        buttonText: &quot;Add a File ... &quot;,
+        multiple: true,
+        itemId: 'filepicker',
+        listeners: {
+          change: this.onFileChanged
+        }
+      },
+      msgCmpDef = {
+        xtype: 'container',
+        cls: 'droppable-region',
+        html: &quot;Drop Files Here&quot;,
+        width: '100%',
+        height: 25,
+        itemId: 'dropMsg',
+        hidden: true
+      };
+
+      if(this.supportsFileDnD) {
+        me.add([fileCmpDef, msgCmpDef]);
+
+        myEl.dom.addEventListener(&quot;dragenter&quot;, function (evt) {
+          fileCmp = fileCmp || me.down('#filepicker');
+          
+          if(fileCmp.isVisible()) {
+            msgCmp = msgCmp || me.down('#dropMsg');
+
+            fileCmp.setVisible(false);
+            msgCmp.setVisible(true);
+            msgCmp.getEl().highlight();
+          }
+
+          return false;
+        }, false);
+
+        myEl.dom.addEventListener(&quot;dragover&quot;, function (evt) {
+          evt.stopPropagation();
+          evt.preventDefault();
+
+          return false;
+        }, false);
+
+        myEl.dom.addEventListener(&quot;dragleave&quot;, function (evt) {
+          fileCmp = fileCmp || me.down('#filepicker');
+
+          if(! fileCmp.isVisible()) {
+            msgCmp = msgCmp || me.down('#dropMsg');
+
+            fileCmp.setVisible(true);
+            msgCmp.setVisible(false);
+          }
+
+          return false;
+        }, false);
+        
+        myEl.dom.addEventListener(&quot;drop&quot;, function (evt) {
+          
+          evt.stopPropagation();
+          evt.preventDefault(); 
+          
+          fileCmp = fileCmp || me.down('#filepicker');
+          msgCmp = msgCmp || me.down('#dropMsg');
+          fileCmp.setVisible(true);
+          msgCmp.setVisible(false);
+          
+          // Ext.Array.each(evt.dataTransfer.files, function(file) { 
+          //   fileMgr.addFile(file);
+          // });
+
+        }, false);
+
+      }
+      else
+        me.add(fileCmpDef);
+
+    }, this);
+  }
+});</pre>
+</body>
+</html>

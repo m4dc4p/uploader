@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Cs-file-data-FileManager'>/**
+</span>   @class Cs.file.data.FileManager
+
+   Manages a simple list of files. Each file can be a
+   [File](http://www.w3.org/TR/FileAPI/) object (as defined by the
+   W3C; additional documentation on the [Mozilla Developer
+   Network](https://developer.mozilla.org/en/DOM/File)) or a
+   [Ext.form.field.File](http://docs.sencha.com/ext-js/4-0/#/api/Ext.form.field.File)
+   component.
+   
+   The class provides methods for adding, removing and enumerating
+   files. The class fires events when files are added or removed, as well.
+   
+   Each file is represented as an instance of the {@link Cs.file.data.File} class.
+*/
+Ext.define('Cs.file.data.FileManager', {
+  mixins: [
+    'Ext.util.Observable'
+  ],
+  requires: [
+    'Ext.util.Observable',
+    'Ext.data.Store',
+    'Cs.file.data.File'
+  ],
+  constructor: function () {
+    var me = this,
+    fs = Ext.create('Ext.data.Store', {
+      model: 'Cs.file.data.File'
+    });
+
+    me.addEvents(
+<span id='Cs-file-data-FileManager-event-fileadded'>      /**
+</span>Fired when a file is added to the manager. 
+         
+@param {Cs.file.data.File} file The file record that was created
+when the file was added.
+@event
+       */
+      'fileadded', 
+<span id='Cs-file-data-FileManager-event-fileremoved'>      /**
+</span>Fired when a file is removed from the manager. 
+         
+@param {Cs.file.data.File} file The file record that was removed.
+@event
+       */
+      'fileremoved');
+
+<span id='Cs-file-data-FileManager-method-addFile'>    /**
+</span>Add a file to the file manager. Returns the {@link Cs.file.data.File}
+instance created. Fires the {@link #fileadded} event after the to-be-returned 
+instance has been added to the store.
+       
+@param {Object} file Either a [File](http://www.w3.org/TR/FileAPI/) object
+or a [Ext.form.field.File](http://docs.sencha.com/ext-js/4-0/#/api/Ext.form.field.File) component. 
+@return {Cs.file.data.File}
+    */
+    this.addFile = function (file) {
+      var id, fileRec, afterCreate = function (rec) { 
+        id = fs.getCount() * -1;
+        rec.setId(id);
+        rec.phantom = false;
+        rec.raw = file;
+        fileRec = rec;
+      };
+
+      if(typeof file.getAsText != &quot;undefined&quot;) {
+        // file is a File object.
+        Ext.Array.each(fs.add({ 
+          name: file.name,
+          size: file.size,
+          raw: file
+        }), afterCreate);
+        
+        console.log(&quot;added: &quot; + file.name);
+      }
+      else if(typeof file.fileInputEl != &quot;undefined&quot;) {
+        // file is a form Ext.Element
+        Ext.Array.each(fs.add({ 
+          name: file.getValue(),
+          size: -1,
+          raw: file
+        }), afterCreate);
+      }
+      else
+        throw &quot;Unrecognized file type.&quot;;
+
+      me.fireEvent('fileadded', fileRec);
+      return fileRec;
+    };
+
+<span id='Cs-file-data-FileManager-method-removeFile'>    /**
+</span>Remove a file managed by this instance. Fires the {@link #fileremoved}
+event after the file is removed.  If the file is not found, no error
+occurs.
+
+@param {Cs.file.data.File} file The file that was removed.
+@return {Cs.file.data.File}
+     */
+    this.removeFile = function (file) {
+      var idx = fs.findBy(function(record) { return record.getId() === file.getId(); });
+      if(idx &gt;= 0) {
+        fs.removeAt(idx);
+        me.fireEvent('fileremoved', file);
+      }
+    };
+
+<span id='Cs-file-data-FileManager-method-each'>    /**
+</span>Applies the function given to all {@link Cs.file.data.File}
+instances managed by this object.
+
+@param {Function} fn A function that takes one argument, a
+{@link Cs.file.data.File} instance. Returning a falsey value
+from this function will stop the iteration.
+       
+@param {Object} scope An optional scope to execute `fn`
+in. Defaults to the this instance of the {@link Cs.file.data.FileManager} if
+not provided.
+    */
+    this.each = function (fn, scope) {
+      fs.each(function(record) { 
+        return fn.call(scope || me, record);
+      });
+    }
+  }
+});
+
+</pre>
+</body>
+</html>

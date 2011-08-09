@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.require([
+  'Ext.container.Container',
+  'Cs.file.data.FileUploader',
+  'Cs.file.ui.FileItem'
+]);
+
+Ext.define('Cs.file.ui.UglyFileUploader', {
+  extend: 'Ext.container.Container',
+  alias: 'widget.uglyfileuploader',
+  config: {
+    mgr: null
+  },
+  constructor: function(config) {
+    var listContainer,
+    me = this,
+    fileItems = { },
+    form,
+    fileMgr = config[&quot;mgr&quot;] || null,
+    uploader = Ext.create('Cs.file.data.FileUploader', fileMgr, {
+      url: &quot;upload.php&quot;,
+      progress: function(file, total, amt, evt) { 
+        console.log(&quot;Uploaded &quot; + Ext.Number.toFixed(100 * amt / total, 2) + &quot; of &quot; + file.get('name'));
+      },  
+      success: function(file, response, options) { 
+        console.log(&quot;Successfully uploaded &quot; + file.get('name'));
+      },
+      failure: function(file, response, options) {
+        console.log(&quot;Failed to upload &quot; + file.get('name'));
+      },
+      callback: function(file, options, success, response) {
+        console.log(&quot;Callback for &quot; + file.get('name'));
+      }});
+
+    this.initConfig(config);
+
+    fileMgr.on('fileadded', function(record) {
+      var item = Ext.create('Cs.file.ui.FileItem', record.get('name'), record.get('size'));
+
+      item.on('remove', function () {
+        fileMgr.removeFile(record);
+        listContainer.remove(item);
+      });
+
+      listContainer.add(item);
+    }, this);
+
+    this.privateInit = function() {
+      var count = 1;
+
+      me.insert(0, {
+        xtype: 'button',
+        height: 20,
+        text: 'Upload Files',
+        listeners: {
+          click: function() {
+            uploader.upload();
+          }
+        }
+      });
+
+      listContainer = me.insert(0, {
+        xtype: &quot;container&quot;,
+        width: &quot;100%&quot;,
+        flex: 1,
+        autoScroll: true,
+        layout: {type: &quot;vbox&quot;, align: &quot;stretch&quot;}
+      });
+
+      form = me.insert(0, {
+        xtype: &quot;container&quot;,
+        width: &quot;100%&quot;,
+        layout: {type: &quot;hbox&quot;, pack: &quot;end&quot;},
+        items: [{
+          xtype: &quot;filefield&quot;,
+          name: &quot;filepicker&quot;,
+          width: 80,
+          buttonText: &quot;Add a File ... (&quot; + count + &quot;)&quot;,
+          buttonOnly: true,
+          multiple: true,
+          listeners: {
+            change: function(field, value, opt) {
+              var inputCnt = field.ownerCt,
+              inputEl = field.fileInputEl;
+
+              if(inputEl.dom.files) {
+                Ext.Array.each(inputEl.dom.files, fileMgr.addFile, fileMgr);
+              }
+              else if(inputEl.getValue()) {
+                fileMgr.addFile(field);
+                
+                count = count + 1;
+
+                inputCnt.add(field.cloneConfig({buttonText: &quot;Add a File ... (&quot; + count + &quot;)&quot;}));
+                field.setVisible(false);
+              }
+              else
+                throw &quot;Unsupported file input type.&quot;;
+            }
+          }
+        }]
+      });
+
+      me.on(&quot;afterrender&quot;, function () {
+        var myEl = me.getEl();
+
+        // necessary to prevent browser redirect when the file is
+        // dropped.
+        myEl.dom.addEventListener(&quot;dragover&quot;, function (evt) {
+          evt.stopPropagation();
+          evt.preventDefault();
+
+          return false;
+        }, false);
+
+        myEl.dom.addEventListener(&quot;drop&quot;, function (evt) {
+
+          evt.stopPropagation();
+          evt.preventDefault(); 
+
+          Ext.Array.each(evt.dataTransfer.files, function(file) { 
+            fileMgr.addFile(file);
+          });
+
+        }, false);
+      }, me);
+    };
+
+    this.callParent([config]);
+  },
+  initComponent: function() {
+    this.callParent();
+    this.privateInit();
+  }
+});
+
+</pre>
+</body>
+</html>

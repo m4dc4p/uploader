@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">Ext.Loader.setConfig({
+  enabled: true,
+  paths: {'Cs': 'src'},
+  disableCaching: false
+});
+
+Ext.require(['Cs.file.data.FileManager',
+             'Ext.container.Container',
+             'Cs.file.ui.SimpleFileUploader'
+            ]);     
+
+Ext.onReady(function() {
+  var mgr = Ext.create('Cs.file.data.FileManager');
+
+  Ext.create('Ext.container.Container', {
+    renderTo: Ext.getBody(),
+    layout: {type: 'vbox', align: 'stretch' },
+    width: 300,
+    height: 300,
+    style: { background: &quot;#eee&quot; },
+    items: [{ 
+      xtype: 'simplefileuploader',
+      layout: Ext.create('Ext.layout.container.VBox', {align: 'stretch'}),
+      height: 35,
+      padding: 5
+    }]
+  });
+});
+</pre>
+</body>
+</html>
