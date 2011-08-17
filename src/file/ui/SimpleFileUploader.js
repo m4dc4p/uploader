@@ -52,6 +52,7 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
       },
       hidden: true
     },
+        listCmp,
     uploaderDef = { url: me.getUrl() };
 
     this.callParent(arguments);
@@ -70,7 +71,7 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
         var hasDirtyFile = false;
 
         me.fileMgr.removeFile(record);
-        me.remove(item);
+        listCmp.remove(item);
         delete fileMap[record.get('name')];
 
         me.fileMgr.each(function (file) { 
@@ -83,7 +84,7 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
       });
 
       uploadCmp.setVisible(true);
-      me.insert(me.items.getCount() - 1, item);
+      listCmp.add(item);
     });
 
     if(this.supportsFile) {
@@ -183,6 +184,12 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
         }, false);
       }
 
+      listCmp = me.add({
+            xtype: 'container',
+            flex: 1,
+            layout: 'anchor',
+            autoScroll: true
+        });
       uploadCmp = me.add(uploadCmpDef);
     });
   }

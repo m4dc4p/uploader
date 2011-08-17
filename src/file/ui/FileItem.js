@@ -37,13 +37,22 @@ Ext.define('Cs.file.ui.FileItem', {
       });
     }
     else {
-      me.add({
-        xtype: 'container',
-        height: '100%',
-        width: '100%',
-        html: 'Failed to upload ' + Ext.String.htmlEncode(me.name) + '.'
-      });
+        me.add({ xtype: 'toolbar',
+               height: "100%",
+               items: [{
+                       xtype: 'container',
+                           html: 'Failed to upload ' + Ext.String.htmlEncode(me.name) + '.'
+                           }, '->', { 
+        xtype: 'tool',
+        type: 'close',
+        listeners: {
+          click: function() {
+                               Ext.defer(function () { me.ownerCt.remove(me); }, 100);
+          }
+        }
+                    }]});
     }
+
   },
   initComponent: function () {
     var me = this;
