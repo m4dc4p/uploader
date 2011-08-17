@@ -5,6 +5,7 @@ Ext.require([
 // A component to represent a file.
 Ext.define('Cs.file.ui.FileItem', {
   extend: 'Ext.container.Container',
+  alias: 'widget.fileitem',
   config: { 
     itemTpl: Ext.core.DomHelper.createTemplate('{name} ({size} bytes) <span class="progress"></span>') 
   },
@@ -20,22 +21,43 @@ Ext.define('Cs.file.ui.FileItem', {
 
     me.callParent([config]);
   },
+  setProgress: function(amt) {
+  },
+  setStatus: function(success) {
+    var me = this,
+    toolbar = me.down('toolbar');
+
+    toolbar.setVisible(false);
+    if(success) {
+      me.add({
+        xtype: 'container',
+        height: '100%',
+        width: '100%',
+        html: 'Uploaded ' + Ext.String.htmlEncode(me.name) + '.'
+      });
+    }
+    else {
+      me.add({
+        xtype: 'container',
+        height: '100%',
+        width: '100%',
+        html: 'Failed to upload ' + Ext.String.htmlEncode(me.name) + '.'
+      });
+    }
+  },
   initComponent: function () {
     var me = this;
     this.callParent();
 
     me.add({
-      xtype: 'container',
-      layout: { type: 'hbox' },
+      xtype: 'toolbar',
+      height: "100%",
       items: [{
         xtype: 'container',
-        html: me.getItemTpl().apply({name: me.name, size: me.size}),
-        flex: 1
-      }, { 
-        xtype: 'button',
-        text: 'Remove',
-        width: 60,
-        height: 30,
+        html: me.getItemTpl().apply({name: me.name, size: me.size})
+      }, '->', { 
+        xtype: 'tool',
+        type: 'close',
         listeners: {
           click: function() {
             me.fireEvent('remove');

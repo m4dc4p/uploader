@@ -20,8 +20,7 @@ Ext.onReady(function() {
     style: { background: "#eee" },
     items: [{ 
       xtype: 'simplefileuploader',
-      layout: Ext.create('Ext.layout.container.VBox', {align: 'stretch'}),
-      height: 35,
+      url: 'upload.php',
       padding: 5
     }]
   });
