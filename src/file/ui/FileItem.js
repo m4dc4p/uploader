@@ -2,13 +2,27 @@ Ext.require([
   'Ext.container.Container'
 ]);
 
-// A component to represent a file.
+/**
+A UI component represeting a single file that will be uploaded.
+*/
 Ext.define('Cs.file.ui.FileItem', {
   extend: 'Ext.container.Container',
   alias: 'widget.fileitem',
   config: { 
-    itemTpl: Ext.core.DomHelper.createTemplate('{name} ({size} bytes) <span class="progress"></span>') 
+/**
+@cfg A template that will be used to display the file before 
+it is uploaded. `name` and `size` are available properties.
+*/
+    itemTpl: Ext.core.DomHelper.createTemplate('{name} ({size} bytes)') 
   },
+/**
+Create the component for the given file.
+
+@param {String} name The name of the file.
+@param {Number} size The size of the file, in bytes.
+@param {Object} config A config to pass to the base class
+of the component.
+*/
   constructor: function(name, size, config) {
     var me = this;
 
@@ -18,53 +32,79 @@ Ext.define('Cs.file.ui.FileItem', {
     me.getItemTpl().compile();
     me.name = name;
     me.size = size;
+/**
+Updates the uploading progress of the given file.
+
+@param {Number} amt The number of bytes uploaded so far.
+*/
+    me.setProgress = Ext.Function.createThrottled(function(amt) {
+      me.progress.updateProgress(amt / me.size);
+    }, 100);
 
     me.callParent([config]);
   },
-  setProgress: function(amt) {
-  },
+/**
+Indicates if the given file was uploaded successfully or
+not.
+
+@param {Boolean} success True or false depending on uploaded status.
+*/
   setStatus: function(success) {
     var me = this,
-    toolbar = me.down('toolbar');
-
-    toolbar.setVisible(false);
-    if(success) {
-      me.add({
-        xtype: 'container',
-        height: '100%',
-        width: '100%',
-        html: 'Uploaded ' + Ext.String.htmlEncode(me.name) + '.'
-      });
-    }
-    else {
-        me.add({ xtype: 'toolbar',
-               height: "100%",
-               items: [{
-                       xtype: 'container',
-                           html: 'Failed to upload ' + Ext.String.htmlEncode(me.name) + '.'
-                           }, '->', { 
+    mkToolbar = function (item) {
+      var arr = ['->', { 
         xtype: 'tool',
         type: 'close',
         listeners: {
-          click: function() {
-                               Ext.defer(function () { me.ownerCt.remove(me); }, 100);
+          click: { 
+            fn: function() {
+              Ext.defer(function () { me.ownerCt.remove(me); }, 100);
+            },
+            single: true
           }
         }
-                    }]});
-    }
+      }];
 
+      // insert the item given at the front
+      // of our common toolbar
+      Ext.Array.splice(arr, 0, 0, item);
+
+      return { 
+        xtype: 'toolbar',
+        height: "100%",
+        items: arr
+      };
+    },
+    toolbar = me.down('toolbar');
+
+    toolbar.setVisible(false);
+    me.progress.reset();
+
+    if(success) 
+      me.add(mkToolbar({
+        xtype: 'container',
+        style: { color: 'green' },
+        html: 'Uploaded ' + Ext.String.htmlEncode(me.name) + '.'
+      }));
+    else 
+      me.add(mkToolbar({
+        xtype: 'container',
+        style: { color: 'red' },
+        html: 'Failed to upload ' + Ext.String.htmlEncode(me.name) + '.'
+      }));
   },
   initComponent: function () {
     var me = this;
-    this.callParent();
+    me.callParent();
 
+    me.progress = Ext.create('Ext.ProgressBar', { width: 50 });
     me.add({
       xtype: 'toolbar',
       height: "100%",
       items: [{
         xtype: 'container',
         html: me.getItemTpl().apply({name: me.name, size: me.size})
-      }, '->', { 
+      }, '->', me.progress, { 
         xtype: 'tool',
         type: 'close',
         listeners: {

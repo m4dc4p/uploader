@@ -90,6 +90,11 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
     if(this.supportsFile) {
       uploaderDef = Ext.apply(uploaderDef, {
         progress: function(file, total, amt, evt) { 
+          var item = fileMap[file.get('name')];
+          if(item) {
+            item.setProgress(amt);
+          }
+
           console.log("Uploaded " + Ext.Number.toFixed(100 * amt / total, 2) + " of " + file.get('name'));
         }});
     }
