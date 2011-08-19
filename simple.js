@@ -15,7 +15,7 @@ Ext.onReady(function() {
   Ext.create('Ext.container.Container', {
     renderTo: Ext.getBody(),
     layout: {type: 'vbox', align: 'stretch' },
-    width: 300,
+    width: 600,
     height: 300,
     style: { background: "#eee" },
     items: [{ 
