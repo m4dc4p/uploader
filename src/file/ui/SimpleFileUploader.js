@@ -6,16 +6,29 @@ Ext.require([
   'Cs.file.ui.FileItem'
 ]);
 
-/* A simple UI for file uploading that shows a "Browse"
-   button. Will also allow file(s) to be dropped on
-   the container. */
+/**
+A simple UI for file uploading that shows a "Browse" button. Will also
+allow file(s) to be dropped on the container.
+*/
 Ext.define('Cs.file.ui.SimpleFileUploader', {
   extend: 'Ext.container.Container',
   config: {
+/**
+The URL that files will be uploaded to. Required.
+*/
     url: undefined,
+/**
+A function to upload files with. Will be given to
+the internal {@link Cs.file.data.FileUploader} instance
+and must have the same signature as specified for that
+object's {@link Cs.file.data.FileUploader#uploadWith} method.
+*/
     uploadWith: undefined,
-    itemConfig: undefined,
-    layout: Ext.create('Ext.layout.container.VBox', { align: 'stretch' })
+/**
+A config to apply to the FileItem component used to 
+represent each file in the uploader.
+*/
+    itemConfig: undefined
   },
   alias: 'widget.simplefileuploader',
   constructor: function(config) {
@@ -51,13 +64,14 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
       },
       hidden: true
     },
-        listCmp,
+    listCmp,
+    fileMgr = Ext.create('Cs.file.data.FileManager'),
+    uploader,
     uploaderDef = { url: me.getUrl() };
 
     this.callParent(arguments);
 
-    this.fileMgr = Ext.create('Cs.file.data.FileManager');
-    this.fileMgr.on('fileadded', function(record) {
+    fileMgr.on('fileadded', function(record) {
       var item = Ext.create('Cs.file.ui.FileItem', record.get('name'), record.get('size'), 
                             me.getItemConfig() ||
                             { height: 25, 
@@ -69,11 +83,13 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
       item.on('remove', function () {
         var hasDirtyFile = false;
 
-        me.fileMgr.removeFile(record);
+        fileMgr.removeFile(record);
+        uploader.abort(record);
+
         listCmp.remove(item);
         delete fileMap[record.get('name')];
 
-        me.fileMgr.each(function (file) { 
+        fileMgr.each(function (file) { 
           return ! (hasDirtyFile = file.dirty);
         });
 
@@ -93,17 +109,14 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
           if(item) {
             item.setProgress(amt);
           }
-
-          console.log("Uploaded " + Ext.Number.toFixed(100 * amt / total, 2) + " of " + file.get('name'));
         }});
     }
 
-    uploader = Ext.create('Cs.file.data.FileUploader', this.fileMgr, Ext.apply(uploaderDef, { 
+    uploader = Ext.create('Cs.file.data.FileUploader', fileMgr, Ext.apply(uploaderDef, { 
       success: function(file, response, options) { 
         var item = fileMap[file.get('name')];
         if(item) {
           item.setStatus(true);
-          console.log("Successfully uploaded " + file.get('name'));
           delete fileMap[file.get('name')];
         }
       },
@@ -111,12 +124,8 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
         var item = fileMap[file.get('name')];
         if(item) {
           item.setStatus(false);
-          console.log("Failed to upload " + file.get('name'));
           delete fileMap[file.get('name')];
         }
-      },
-      callback: function(file, options, success, response) {
-        console.log("Callback for " + file.get('name'));
       }}));
 
     this.on('afterrender', function(c, opt) {
@@ -133,9 +142,9 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
         listeners: {
           change: function(field, value, opt) {
             if(Cs.file.data.FileManager.supportsFile) 
-              Ext.Array.each(field.fileInputEl.dom.files, me.fileMgr.addFile, me.fileMgr);
+              Ext.Array.each(field.fileInputEl.dom.files, fileMgr.addFile, fileMgr);
             else 
-              me.fileMgr.addFile(field);
+              fileMgr.addFile(field);
 
             fileCmp.setVisible(false);
             fileCmp = me.insert(0, fileCmpDef);
@@ -182,7 +191,7 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
           msgCmp.setVisible(false);
 
           Ext.Array.each(evt.dataTransfer.files, function(file) { 
-            me.fileMgr.addFile(file);
+            fileMgr.addFile(file);
           });
 
         }, false);
