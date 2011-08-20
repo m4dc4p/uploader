@@ -28,7 +28,7 @@ Ext.data.JsonP.Cs_file_data_File({
         "owner": "Cs.file.data.File",
         "alias": null,
         "protected": false,
-        "linenr": 81,
+        "linenr": 112,
         "private": false,
         "name": "raw",
         "filename": "src/file/data/File.js",
@@ -92,7 +92,7 @@ Ext.data.JsonP.Cs_file_data_File({
         "owner": "Cs.file.data.File",
         "alias": null,
         "protected": false,
-        "linenr": 60,
+        "linenr": 68,
         "private": false,
         "name": "FILE",
         "filename": "src/file/data/File.js",
@@ -109,7 +109,7 @@ Ext.data.JsonP.Cs_file_data_File({
         "owner": "Cs.file.data.File",
         "alias": null,
         "protected": false,
-        "linenr": 50,
+        "linenr": 58,
         "private": false,
         "name": "FORM",
         "filename": "src/file/data/File.js",
@@ -131,7 +131,64 @@ Ext.data.JsonP.Cs_file_data_File({
 
     ],
     "method": [
-
+      {
+        "shortDoc": " ...",
+        "tagname": "method",
+        "deprecated": null,
+        "return": {
+          "type": "Boolean",
+          "doc": "<p>Determines if the argument given is a <a href=\"http://www.w3.org/TR/FileAPI/\">File</a> object.</p>\n"
+        },
+        "static": true,
+        "inheritable": false,
+        "owner": "Cs.file.data.File",
+        "alias": null,
+        "protected": false,
+        "linenr": 76,
+        "private": false,
+        "name": "isFile",
+        "filename": "src/file/data/File.js",
+        "params": [
+          {
+            "type": "Object",
+            "optional": false,
+            "name": "f",
+            "doc": "<p>The object to test.</p>\n"
+          }
+        ],
+        "doc": "\n",
+        "html_filename": "File.html",
+        "href": "File.html#Cs-file-data-File-method-isFile"
+      },
+      {
+        "shortDoc": " ...",
+        "tagname": "method",
+        "deprecated": null,
+        "return": {
+          "type": "Boolean",
+          "doc": "<p>Determines if the argument given is a <a href=\"http://docs.sencha.com/ext-js/4-0/#/api/Ext.form.field.File\">Ext.form.field.File</a> component.</p>\n"
+        },
+        "static": true,
+        "inheritable": false,
+        "owner": "Cs.file.data.File",
+        "alias": null,
+        "protected": false,
+        "linenr": 88,
+        "private": false,
+        "name": "isFileField",
+        "filename": "src/file/data/File.js",
+        "params": [
+          {
+            "type": "Object",
+            "optional": false,
+            "name": "f",
+            "doc": "<p>The object to test.</p>\n"
+          }
+        ],
+        "doc": "\n",
+        "html_filename": "File.html",
+        "href": "File.html#Cs-file-data-File-method-isFileField"
+      }
     ]
   },
   "allMixins": [

@@ -40,7 +40,7 @@ Ext.data.JsonP.Cs_file_data_FileManager({
         "owner": "Cs.file.data.FileManager",
         "alias": null,
         "protected": false,
-        "linenr": 32,
+        "linenr": 42,
         "private": false,
         "name": "fileadded",
         "filename": "src/file/data/FileManager.js",
@@ -71,7 +71,7 @@ Ext.data.JsonP.Cs_file_data_FileManager({
         "owner": "Cs.file.data.FileManager",
         "alias": null,
         "protected": false,
-        "linenr": 40,
+        "linenr": 50,
         "private": false,
         "name": "fileremoved",
         "filename": "src/file/data/FileManager.js",
@@ -108,7 +108,7 @@ Ext.data.JsonP.Cs_file_data_FileManager({
         "owner": "Cs.file.data.FileManager",
         "alias": null,
         "protected": false,
-        "linenr": 48,
+        "linenr": 58,
         "private": false,
         "name": "addFile",
         "filename": "src/file/data/FileManager.js",
@@ -137,7 +137,7 @@ Ext.data.JsonP.Cs_file_data_FileManager({
         "owner": "Cs.file.data.FileManager",
         "alias": null,
         "protected": false,
-        "linenr": 107,
+        "linenr": 100,
         "private": false,
         "name": "each",
         "filename": "src/file/data/FileManager.js",
@@ -172,7 +172,7 @@ Ext.data.JsonP.Cs_file_data_FileManager({
         "owner": "Cs.file.data.FileManager",
         "alias": null,
         "protected": false,
-        "linenr": 91,
+        "linenr": 84,
         "private": false,
         "name": "removeFile",
         "filename": "src/file/data/FileManager.js",
@@ -192,7 +192,23 @@ Ext.data.JsonP.Cs_file_data_FileManager({
   },
   "statics": {
     "property": [
-
+      {
+        "type": "Boolean",
+        "tagname": "property",
+        "deprecated": null,
+        "static": true,
+        "inheritable": false,
+        "owner": "Cs.file.data.FileManager",
+        "alias": null,
+        "protected": false,
+        "linenr": 26,
+        "private": false,
+        "name": "supportsFile",
+        "filename": "src/file/data/FileManager.js",
+        "doc": "<p>Indicates if the browser supports the\n<a href=\"http://www.w3.org/TR/FileAPI/\">File</a> object.</p>\n",
+        "html_filename": "FileManager.html",
+        "href": "FileManager.html#Cs-file-data-FileManager-property-supportsFile"
+      }
     ],
     "css_var": [
 
