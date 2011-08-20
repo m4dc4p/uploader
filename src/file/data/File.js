@@ -32,14 +32,22 @@ Other properties, except `type`, will be copied to the corresponding field.
   */    
     constructor: function (data) {
       if(typeof data.raw == "undefined")
-        throw "raw property missing. Can't create a file without raw data.";
+        throw "Cs.file.data.File: raw property missing. Can't create a file without raw data.";
 
       this.raw = data.raw;
       
-      if(typeof this.raw.getAsText != "undefined") 
+      if(Cs.file.data.File.isFile(this.raw)) {
         data.type = Cs.file.data.File.FILE;
-      else if(typeof this.raw.fileInputEl != "undefined") 
+        data.size = this.raw.size;
+        data.name = this.raw.name;
+      }
+      else if(Cs.file.data.File.isFileField(raw)) {
         data.type = Cs.file.data.File.FORM;
+        data.size = -1;
+        data.name = this.raw.name;
+      }
+      else
+        throw "Cs.file.data.File: Unable to determine file type.";
 
       this.callParent(arguments);
     },
@@ -65,6 +73,29 @@ The value assigned to the `type` field when the file is
 represented by a [File](http://www.w3.org/TR/FileAPI/) object.
 */
       FILE: FILE,
+/**
+@static
+@return {Boolean} 
+
+Determines if the argument given is a [File](http://www.w3.org/TR/FileAPI/) object.
+
+@param {Object} f The object to test.
+*/
+      isFile: function(f) {
+        return Cs.file.data.FileManager.supportsFile && 
+          File.prototype.isPrototypeOf(f);
+      },
+/**
+@static
+@return {Boolean} 
+
+Determines if the argument given is a [Ext.form.field.File](http://docs.sencha.com/ext-js/4-0/#/api/Ext.form.field.File) component.
+
+@param {Object} f The object to test.
+*/
+      isFileField: function(f) {
+        return Ext.ClassManager.getName(f) == "Ext.form.field.File";
+      }
     },
     fields: [{
       name: 'id', type: 'int' 
