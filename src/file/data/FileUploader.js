@@ -179,23 +179,11 @@ Configuration parameters.
             };
             
             if(file.get('type') == Cs.file.data.File.FILE) {
-              fr = Ext.apply(new FileReader(), {
-                onload: function(evt) {
-                  conn.request(Ext.merge({ 
-                    params: { 
-                      data: fr.result 
-                    }, 
-                  }, req));
-                },
-                onerror: function() {
-                  console.log("Error reading: " + file.get('name'));
-                },
-                onabort: function() {
-                  console.log("Error reading: " + file.get('name'));
-                }
-              });
-              
-              fr.readAsBinaryString(file.raw);
+              conn.request(Ext.apply(req, { file: file.raw }))
+              /*
+                Need to determine a way to indicate we
+                want the file sent as text still.
+              */
             }
             else if(file.get('type') == Cs.file.data.File.FORM) {
               form = Ext.create('Ext.form.Panel', {
