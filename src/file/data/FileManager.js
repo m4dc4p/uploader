@@ -22,6 +22,16 @@ Ext.define('Cs.file.data.FileManager', {
     'Ext.data.Store',
     'Cs.file.data.File'
   ],
+  statics: {
+/**
+@static
+@property {Boolean}
+
+Indicates if the browser supports the
+[File](http://www.w3.org/TR/FileAPI/) object.
+*/
+    supportsFile: typeof window["File"] != "undefined"
+  },
   constructor: function () {
     var me = this,
     fs = Ext.create('Ext.data.Store', {
@@ -54,7 +64,7 @@ instance has been added to the store.
 or a [Ext.form.field.File](http://docs.sencha.com/ext-js/4-0/#/api/Ext.form.field.File) component. 
 @return {Cs.file.data.File}
     */
-    this.addFile = function (file) {
+    me.addFile = function (file) {
       var id, fileRec, afterCreate = function (rec) { 
         id = fs.getCount() * -1;
         rec.setId(id);
@@ -63,27 +73,10 @@ or a [Ext.form.field.File](http://docs.sencha.com/ext-js/4-0/#/api/Ext.form.fiel
         fileRec = rec;
       };
 
-      if(typeof file.getAsText != "undefined") {
-        // file is a File object.
-        Ext.Array.each(fs.add({ 
-          name: file.name,
-          size: file.size,
-          raw: file
-        }), afterCreate);
-        
-        console.log("added: " + file.name);
-      }
-      else if(typeof file.fileInputEl != "undefined") {
-        // file is a form Ext.Element
-        Ext.Array.each(fs.add({ 
-          name: file.getValue(),
-          size: -1,
-          raw: file
-        }), afterCreate);
-      }
-      else
-        throw "Unrecognized file type.";
-
+      Ext.Array.each(fs.add({raw: file}), 
+                     afterCreate);
+      
+      console.log("added: " + file.name);
       me.fireEvent('fileadded', fileRec);
       return fileRec;
     };
@@ -96,7 +89,7 @@ occurs.
 @param {Cs.file.data.File} file The file that was removed.
 @return {Cs.file.data.File}
      */
-    this.removeFile = function (file) {
+    me.removeFile = function (file) {
       var idx = fs.findBy(function(record) { return record.getId() === file.getId(); });
       if(idx >= 0) {
         fs.removeAt(idx);
@@ -116,7 +109,7 @@ from this function will stop the iteration.
 in. Defaults to the this instance of the {@link Cs.file.data.FileManager} if
 not provided.
     */
-    this.each = function (fn, scope) {
+    me.each = function (fn, scope) {
       fs.each(function(record) { 
         return fn.call(scope || me, record);
       });
