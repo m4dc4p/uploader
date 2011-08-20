@@ -25,7 +25,6 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
     });
 
     this.initConfig(config);
-    this.supportsFile = typeof window["File"] != "undefined";
     this.callParent(arguments);
   },
   initComponent: function () {
@@ -87,7 +86,7 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
       listCmp.add(item);
     });
 
-    if(this.supportsFile) {
+    if(Cs.file.data.FileManager.supportsFile) {
       uploaderDef = Ext.apply(uploaderDef, {
         progress: function(file, total, amt, evt) { 
           var item = fileMap[file.get('name')];
@@ -133,7 +132,7 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
         itemId: 'filepicker',
         listeners: {
           change: function(field, value, opt) {
-            if(me.supportsFile) 
+            if(Cs.file.data.FileManager.supportsFile) 
               Ext.Array.each(field.fileInputEl.dom.files, me.fileMgr.addFile, me.fileMgr);
             else 
               me.fileMgr.addFile(field);
@@ -146,7 +145,7 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
 
       fileCmp = me.add(fileCmpDef);
 
-      if(me.supportsFile) {
+      if(Cs.file.data.FileManager.supportsFile) {
         msgCmp = me.add({
           xtype: 'container',
           cls: 'droppable-region',
