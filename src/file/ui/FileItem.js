@@ -24,7 +24,8 @@ Create the component for the given file.
 of the component.
 */
   constructor: function(name, size, config) {
-    var me = this;
+    var me = this,
+    nameCmp = undefined;
 
     me.addEvents('remove');
     me.initConfig(config);
@@ -38,6 +39,8 @@ Updates the uploading progress of the given file.
 @param {Number} amt The number of bytes uploaded so far.
 */
     me.setProgress = Ext.Function.createThrottled(function(amt) {
+      me.nameCmp.setVisible(false);
+      me.progress.setVisible(true);
       me.progress.updateProgress(amt / me.size);
     }, 100);
 
@@ -97,16 +100,23 @@ not.
     var me = this;
     me.callParent();
 
-    me.progress = Ext.create('Ext.ProgressBar', { width: 50 });
+    me.progress = Ext.create('Ext.ProgressBar', { 
+      flex: 1, 
+      hidden: true,
+      text: me.getItemTpl().apply({name: me.name, size: me.size})
+    });
+    me.nameCmp = Ext.create('Ext.container.Container', {
+        flex: 1,
+        html: me.getItemTpl().apply({name: me.name, size: me.size})
+    });
+
     me.add({
       xtype: 'toolbar',
       height: "100%",
-      items: [{
-        xtype: 'container',
-        html: me.getItemTpl().apply({name: me.name, size: me.size})
-      }, '->', me.progress, { 
+      items: [me.nameCmp, me.progress, '->', { 
         xtype: 'tool',
         type: 'close',
+        width: 25,
         listeners: {
           click: function() {
             me.fireEvent('remove');
