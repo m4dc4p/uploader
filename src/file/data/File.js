@@ -41,10 +41,10 @@ Other properties, except `type`, will be copied to the corresponding field.
         data.size = this.raw.size;
         data.name = this.raw.name;
       }
-      else if(Cs.file.data.File.isFileField(raw)) {
+      else if(Cs.file.data.File.isFileField(this.raw)) {
         data.type = Cs.file.data.File.FORM;
         data.size = -1;
-        data.name = this.raw.name;
+        data.name = this.raw.getValue();
       }
       else
         throw "Cs.file.data.File: Unable to determine file type.";
