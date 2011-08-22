@@ -12,9 +12,15 @@ Ext.define('Cs.file.ui.FileItem', {
   alias: 'widget.fileitem',
   config: { 
 /**
-@cfg A template that will be used to display the file before 
-it is uploaded. `name` and `size` are available properties.
-*/
+@cfg {Object} itemTpl
+
+A
+[Ext.XTemplate](http://docs.sencha.com/ext-js/4-0/#!/api/Ext.XTemplate)
+or
+[Ext.Template](http://docs.sencha.com/ext-js/4-0/#!/api/Ext.Template)
+template that will be used to display the file before it is
+uploaded. `name` and `size` are available properties that can be used
+in the template.  */
     itemTpl: Ext.core.DomHelper.createTemplate('{name} ({size} bytes)') 
   },
 /**
@@ -36,7 +42,10 @@ of the component.
     me.name = name;
     me.size = size;
 /**
-Updates the uploading progress of the given file.
+@method setProgress
+
+Updates this component to show the amount of this file that has
+been uploaded so far.
 
 @param {Number} amt The number of bytes uploaded so far.
 */
@@ -49,8 +58,8 @@ Updates the uploading progress of the given file.
     me.callParent([config]);
   },
 /**
-Indicates if the given file was uploaded successfully or
-not.
+Update this component to indicate if the given file was uploaded successfully or
+not. This method should be called once all progress updates (if any) are done.
 
 @param {Boolean} success True or false depending on uploaded status.
 */

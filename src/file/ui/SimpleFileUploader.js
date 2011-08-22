@@ -3,7 +3,7 @@ Ext.require([
   'Ext.layout.container.VBox',
   'Cs.file.data.FileUploader',
   'Cs.file.data.FileManager',
-  'Cs.file.ui.FileItem'
+  'Cs.file.ui.FileItem',
 ]);
 
 /**
@@ -14,23 +14,38 @@ Ext.define('Cs.file.ui.SimpleFileUploader', {
   extend: 'Ext.container.Container',
   config: {
 /**
+@cfg {String} url
+
 The URL that files will be uploaded to. Required.
 */
     url: undefined,
 /**
+@cfg {Function} uploadWith
+
 A function to upload files with. Will be given to
 the internal {@link Cs.file.data.FileUploader} instance
 and must have the same signature as specified for that
 object's {@link Cs.file.data.FileUploader#uploadWith} method.
+
+If not given, then this object will use the 
+{@link Cs.file.data.FileUploader#upload} method.
 */
     uploadWith: undefined,
 /**
-A config to apply to the FileItem component used to 
-represent each file in the uploader.
+@cfg {Object} itemConfig
+
+A config to apply to each {@link Cs.file.ui.FileItem} component created
+by this component.
 */
     itemConfig: undefined
   },
   alias: 'widget.simplefileuploader',
+/**
+Create a new instance of this object.
+
+@param {Object} config The config to apply to this component. A `vbox` layout
+will always be used, but otherwise any config can be given.
+*/
   constructor: function(config) {
     config = Ext.apply(config, { 
       layout: Ext.create('Ext.layout.container.VBox', {align: 'stretch'}),
