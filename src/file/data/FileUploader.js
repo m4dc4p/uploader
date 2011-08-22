@@ -120,6 +120,7 @@ Configuration parameters.
 */
   constructor: function (fileMgr, config) {
     var me = this,
+    uploads = {},
     uploadAs = function(prepareWith) {
       fileMgr.each(function(file)  {
         var defaults = { 
@@ -171,6 +172,7 @@ Configuration parameters.
             };
             
             req.callback = function(options, success, response) {
+              delete uploads[file.getId()];
               if(Ext.isFunction(orig.progress)) 
                 conn.un('progress', progress);
               
@@ -179,7 +181,7 @@ Configuration parameters.
             };
             
             if(file.get('type') == Cs.file.data.File.FILE) {
-              conn.request(Ext.apply(req, { file: file.raw }))
+              uploads[file.getId()] = conn.request(Ext.apply(req, { file: file.raw }));
               /*
                 Need to determine a way to indicate we
                 want the file sent as text still.
@@ -271,6 +273,31 @@ The `prepareWith` function does not have to call the upload call back.
 */ 
     this.uploadWith = function(preparer) {
       uploadAs(preparer);
+    };
+
+/**
+Aborts the upload associated with the file, if possible. Form
+uploads cannot be aborted. 
+
+If the file is uploading and it is aborted, the "failure" and
+"callback" functions for that file will be called. If the
+file has already loaded, the callbacks will not be called.
+
+@param {Cs.data.file.File} file The file whose upload should be aborted.
+
+@return {Boolean} True indicates that we attempted to abort the
+upload; it may still have finished before being aborted, however. False
+indicates we did not try to abort the upload (either it is a form upload
+or the upload had finished.
+*/
+    this.abort = function(file) {
+        if(typeof uploads[file.getId()] != "undefined") {
+            conn.abort(uploads[file.getId()]);
+            delete uploads[file.getId()];
+            return true;
+        }
+        else
+            return false;
     };
     
     this.callParent(arguments);
