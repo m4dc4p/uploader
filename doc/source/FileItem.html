@@ -16,7 +16,9 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">Ext.require([
-  'Ext.container.Container'
+  'Ext.container.Container',
+  'Ext.ProgressBar',
+
 ]);
 
 <span id='Cs-file-ui-FileItem'>/**
@@ -26,10 +28,16 @@ Ext.define('Cs.file.ui.FileItem', {
   extend: 'Ext.container.Container',
   alias: 'widget.fileitem',
   config: { 
-<span id='Cs-file-ui-FileItem-cfg-A'>/**
-</span>@cfg A template that will be used to display the file before 
-it is uploaded. `name` and `size` are available properties.
-*/
+<span id='Cs-file-ui-FileItem-cfg-itemTpl'>/**
+</span>@cfg {Object} itemTpl
+
+A
+[Ext.XTemplate](http://docs.sencha.com/ext-js/4-0/#!/api/Ext.XTemplate)
+or
+[Ext.Template](http://docs.sencha.com/ext-js/4-0/#!/api/Ext.Template)
+template that will be used to display the file before it is
+uploaded. `name` and `size` are available properties that can be used
+in the template.  */
     itemTpl: Ext.core.DomHelper.createTemplate('{name} ({size} bytes)') 
   },
 <span id='Cs-file-ui-FileItem-method-constructor'>/**
@@ -50,8 +58,11 @@ of the component.
     me.getItemTpl().compile();
     me.name = name;
     me.size = size;
-<span id='Cs-file-ui-FileItem-property-setProgress'>/**
-</span>Updates the uploading progress of the given file.
+<span id='Cs-file-ui-FileItem-method-setProgress'>/**
+</span>@method setProgress
+
+Updates this component to show the amount of this file that has
+been uploaded so far.
 
 @param {Number} amt The number of bytes uploaded so far.
 */
@@ -64,8 +75,8 @@ of the component.
     me.callParent([config]);
   },
 <span id='Cs-file-ui-FileItem-method-setStatus'>/**
-</span>Indicates if the given file was uploaded successfully or
-not.
+</span>Update this component to indicate if the given file was uploaded successfully or
+not. This method should be called once all progress updates (if any) are done.
 
 @param {Boolean} success True or false depending on uploaded status.
 */

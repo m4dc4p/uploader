@@ -159,6 +159,35 @@ Ext.data.JsonP.Cs_file_data_FileUploader({
         "href": "FileUploader.html#Cs-file-data-FileUploader-method-constructor"
       },
       {
+        "shortDoc": "Aborts the upload associated with the file, if possible. ...",
+        "tagname": "method",
+        "deprecated": null,
+        "return": {
+          "type": "Boolean",
+          "doc": "<p>True indicates that we attempted to abort the\nupload; it may still have finished before being aborted, however. False\nindicates we did not try to abort the upload (either it is a form upload\nor the upload had finished.</p>\n"
+        },
+        "static": false,
+        "inheritable": false,
+        "owner": "Cs.file.data.FileUploader",
+        "alias": null,
+        "protected": false,
+        "linenr": 278,
+        "private": false,
+        "name": "abort",
+        "filename": "src/file/data/FileUploader.js",
+        "params": [
+          {
+            "type": "Cs.data.file.File",
+            "optional": false,
+            "name": "file",
+            "doc": "<p>The file whose upload should be aborted.</p>\n"
+          }
+        ],
+        "doc": "<p>Aborts the upload associated with the file, if possible. Form\nuploads cannot be aborted.</p>\n\n<p>If the file is uploading and it is aborted, the \"failure\" and\n\"callback\" functions for that file will be called. If the\nfile has already loaded, the callbacks will not be called.</p>\n",
+        "html_filename": "FileUploader.html",
+        "href": "FileUploader.html#Cs-file-data-FileUploader-method-abort"
+      },
+      {
         "shortDoc": "Uploads each file that is dirty in the file\nmanager. ...",
         "tagname": "method",
         "deprecated": null,
@@ -171,7 +200,7 @@ Ext.data.JsonP.Cs_file_data_FileUploader({
         "owner": "Cs.file.data.FileUploader",
         "alias": null,
         "protected": false,
-        "linenr": 203,
+        "linenr": 205,
         "private": false,
         "name": "upload",
         "filename": "src/file/data/FileUploader.js",
@@ -195,7 +224,7 @@ Ext.data.JsonP.Cs_file_data_FileUploader({
         "owner": "Cs.file.data.FileUploader",
         "alias": null,
         "protected": false,
-        "linenr": 223,
+        "linenr": 225,
         "private": false,
         "name": "uploadWith",
         "filename": "src/file/data/FileUploader.js",

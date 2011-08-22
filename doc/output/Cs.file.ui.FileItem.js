@@ -19,23 +19,7 @@ Ext.data.JsonP.Cs_file_ui_FileItem({
   "inheritable": false,
   "members": {
     "property": [
-      {
-        "type": "Object",
-        "tagname": "property",
-        "deprecated": null,
-        "static": false,
-        "inheritable": false,
-        "owner": "Cs.file.ui.FileItem",
-        "alias": null,
-        "protected": false,
-        "linenr": 36,
-        "private": false,
-        "name": "setProgress",
-        "filename": "src/file/ui/FileItem.js",
-        "doc": "<p>Updates the uploading progress of the given file.</p>\n",
-        "html_filename": "FileItem.html",
-        "href": "FileItem.html#Cs-file-ui-FileItem-property-setProgress"
-      }
+
     ],
     "css_var": [
 
@@ -45,7 +29,7 @@ Ext.data.JsonP.Cs_file_ui_FileItem({
     ],
     "cfg": [
       {
-        "shortDoc": "template that will be used to display the file before\nit is uploaded. ...",
+        "shortDoc": "A\nExt.XTemplate\nor\nExt.Template\ntemplate that will be used to display the file before it is\nuploaded. ...",
         "type": "Object",
         "tagname": "cfg",
         "deprecated": null,
@@ -54,13 +38,13 @@ Ext.data.JsonP.Cs_file_ui_FileItem({
         "owner": "Cs.file.ui.FileItem",
         "alias": null,
         "protected": false,
-        "linenr": 12,
+        "linenr": 14,
         "private": false,
-        "name": "A",
+        "name": "itemTpl",
         "filename": "src/file/ui/FileItem.js",
-        "doc": "<p>template that will be used to display the file before\nit is uploaded. <code>name</code> and <code>size</code> are available properties.</p>\n",
+        "doc": "<p>A\n<a href=\"http://docs.sencha.com/ext-js/4-0/#!/api/Ext.XTemplate\">Ext.XTemplate</a>\nor\n<a href=\"http://docs.sencha.com/ext-js/4-0/#!/api/Ext.Template\">Ext.Template</a>\ntemplate that will be used to display the file before it is\nuploaded. <code>name</code> and <code>size</code> are available properties that can be used\nin the template.</p>\n",
         "html_filename": "FileItem.html",
-        "href": "FileItem.html#Cs-file-ui-FileItem-cfg-A"
+        "href": "FileItem.html#Cs-file-ui-FileItem-cfg-itemTpl"
       }
     ],
     "event": [
@@ -80,7 +64,7 @@ Ext.data.JsonP.Cs_file_ui_FileItem({
         "owner": "Cs.file.ui.FileItem",
         "alias": null,
         "protected": false,
-        "linenr": 18,
+        "linenr": 26,
         "private": false,
         "name": "constructor",
         "filename": "src/file/ui/FileItem.js",
@@ -109,7 +93,7 @@ Ext.data.JsonP.Cs_file_ui_FileItem({
         "href": "FileItem.html#Cs-file-ui-FileItem-method-constructor"
       },
       {
-        "shortDoc": "Indicates if the given file was uploaded successfully or\nnot. ...",
+        "shortDoc": "Updates this component to show the amount of this file that has\nbeen uploaded so far. ...",
         "tagname": "method",
         "deprecated": null,
         "return": {
@@ -121,7 +105,36 @@ Ext.data.JsonP.Cs_file_ui_FileItem({
         "owner": "Cs.file.ui.FileItem",
         "alias": null,
         "protected": false,
-        "linenr": 49,
+        "linenr": 44,
+        "private": false,
+        "name": "setProgress",
+        "filename": "src/file/ui/FileItem.js",
+        "params": [
+          {
+            "type": "Number",
+            "optional": false,
+            "name": "amt",
+            "doc": "<p>The number of bytes uploaded so far.</p>\n"
+          }
+        ],
+        "doc": "<p>Updates this component to show the amount of this file that has\nbeen uploaded so far.</p>\n",
+        "html_filename": "FileItem.html",
+        "href": "FileItem.html#Cs-file-ui-FileItem-method-setProgress"
+      },
+      {
+        "shortDoc": "Update this component to indicate if the given file was uploaded successfully or\nnot. ...",
+        "tagname": "method",
+        "deprecated": null,
+        "return": {
+          "type": "void",
+          "doc": "\n"
+        },
+        "static": false,
+        "inheritable": false,
+        "owner": "Cs.file.ui.FileItem",
+        "alias": null,
+        "protected": false,
+        "linenr": 60,
         "private": false,
         "name": "setStatus",
         "filename": "src/file/ui/FileItem.js",
@@ -133,7 +146,7 @@ Ext.data.JsonP.Cs_file_ui_FileItem({
             "doc": "<p>True or false depending on uploaded status.</p>\n"
           }
         ],
-        "doc": "<p>Indicates if the given file was uploaded successfully or\nnot.</p>\n",
+        "doc": "<p>Update this component to indicate if the given file was uploaded successfully or\nnot. This method should be called once all progress updates (if any) are done.</p>\n",
         "html_filename": "FileItem.html",
         "href": "FileItem.html#Cs-file-ui-FileItem-method-setStatus"
       }
@@ -167,7 +180,7 @@ Ext.data.JsonP.Cs_file_ui_FileItem({
   ],
   "alias": null,
   "protected": false,
-  "linenr": 5,
+  "linenr": 7,
   "docauthor": null,
   "author": null,
   "extends": "Ext.container.Container",
