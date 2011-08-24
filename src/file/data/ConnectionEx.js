@@ -54,23 +54,6 @@
       this.addEvents('progress');
       this.callParent(arguments);
     },
-    setOptions: function(options, scope) {
-      // Ugly hack - Connectin.request calls
-      // xhr.send with the data property on the
-      // object returned from this method. To slip our
-      // file into it, we replace teh data element with
-      // our File object.
-      if(options && options.file && 
-         Cs.file.data.FileManager.supportsFile && 
-          File.prototype.isPrototypeOf(options.file)) {
-
-        result = this.callParent(arguments);
-        result.data = options.file;
-        return result;
-      }
-      else
-        return this.callParent(arguments);
-    },
     request: function(options) {
       var me = this,
       origXhr = this.getXhrInstance;

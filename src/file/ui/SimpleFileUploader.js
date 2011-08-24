@@ -22,10 +22,10 @@ The URL that files will be uploaded to. Required.
 /**
 @cfg {Function} uploadWith
 
-A function to upload files with. Will be given to
-the internal {@link Cs.file.data.FileUploader} instance
-and must have the same signature as specified for that
-object's {@link Cs.file.data.FileUploader#uploadWith} method.
+A function to prepare requests before a given file is uploaded. Will
+be given to the internal {@link Cs.file.data.FileUploader} instance
+and must have the same signature as specified for that object's {@link
+Cs.file.data.FileUploader#uploadWith} method.
 
 If not given, then this object will use the 
 {@link Cs.file.data.FileUploader#upload} method.
@@ -48,8 +48,7 @@ will always be used, but otherwise any config can be given.
 */
   constructor: function(config) {
     config = Ext.apply(config, { 
-      layout: Ext.create('Ext.layout.container.VBox', {align: 'stretch'}),
-      height: "100%"
+      layout: Ext.create('Ext.layout.container.Anchor')
     });
 
     this.initConfig(config);
@@ -62,8 +61,10 @@ will always be used, but otherwise any config can be given.
     uploadCmpDef = {
       xtype: 'container',
       height: 28,
+      anchor: "100%",
       padding: "3 0 0 0",
       layout: {type: 'hbox', pack: 'end' },
+      itemId: "upload",
       items: {
         xtype: 'button',
         text: 'Upload',
@@ -149,7 +150,7 @@ will always be used, but otherwise any config can be given.
       fileCmp,
       fileCmpDef = {
         xtype: 'filefield',
-        width: "100%",
+        anchor: "100%",
         height: 30,
         buttonText: "Add a File ... ",
         multiple: true,
@@ -212,13 +213,17 @@ will always be used, but otherwise any config can be given.
         }, false);
       }
 
-      listCmp = me.add({
-            xtype: 'container',
-            flex: 1,
-            layout: 'anchor',
-            autoScroll: true
-        });
-      uploadCmp = me.add(uploadCmpDef);
+      me.add([{
+        xtype: 'container',
+        flex: 1,
+        layout: 'anchor',
+        autoScroll: true,
+        itemId: "filelist"
+      }, uploadCmpDef]);
+
+      listCmp = me.child("#filelist");
+      uploadCmp = me.child("#upload");
+
     });
   }
 });
