@@ -46,7 +46,7 @@ Ext.data.JsonP.Cs_file_ui_SimpleFileUploader({
         "href": "SimpleFileUploader.html#Cs-file-ui-SimpleFileUploader-cfg-itemConfig"
       },
       {
-        "shortDoc": "A function to upload files with. ...",
+        "shortDoc": "A function to prepare requests before a given file is uploaded. ...",
         "type": "Function",
         "tagname": "cfg",
         "deprecated": null,
@@ -59,7 +59,7 @@ Ext.data.JsonP.Cs_file_ui_SimpleFileUploader({
         "private": false,
         "name": "uploadWith",
         "filename": "src/file/ui/SimpleFileUploader.js",
-        "doc": "<p>A function to upload files with. Will be given to\nthe internal <a href=\"#/api/Cs.file.data.FileUploader\" rel=\"Cs.file.data.FileUploader\" class=\"docClass\">Cs.file.data.FileUploader</a> instance\nand must have the same signature as specified for that\nobject's <a href=\"#/api/Cs.file.data.FileUploader-method-uploadWith\" rel=\"Cs.file.data.FileUploader-method-uploadWith\" class=\"docClass\">Cs.file.data.FileUploader.uploadWith</a> method.</p>\n\n<p>If not given, then this object will use the\n<a href=\"#/api/Cs.file.data.FileUploader-method-upload\" rel=\"Cs.file.data.FileUploader-method-upload\" class=\"docClass\">Cs.file.data.FileUploader.upload</a> method.</p>\n",
+        "doc": "<p>A function to prepare requests before a given file is uploaded. Will\nbe given to the internal <a href=\"#/api/Cs.file.data.FileUploader\" rel=\"Cs.file.data.FileUploader\" class=\"docClass\">Cs.file.data.FileUploader</a> instance\nand must have the same signature as specified for that object's <a href=\"#/api/Cs.file.data.FileUploader-method-uploadWith\" rel=\"Cs.file.data.FileUploader-method-uploadWith\" class=\"docClass\">Cs.file.data.FileUploader.uploadWith</a> method.</p>\n\n<p>If not given, then this object will use the\n<a href=\"#/api/Cs.file.data.FileUploader-method-upload\" rel=\"Cs.file.data.FileUploader-method-upload\" class=\"docClass\">Cs.file.data.FileUploader.upload</a> method.</p>\n",
         "html_filename": "SimpleFileUploader.html",
         "href": "SimpleFileUploader.html#Cs-file-ui-SimpleFileUploader-cfg-uploadWith"
       },

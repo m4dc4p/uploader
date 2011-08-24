@@ -39,10 +39,10 @@ The URL that files will be uploaded to. Required.
 <span id='Cs-file-ui-SimpleFileUploader-cfg-uploadWith'>/**
 </span>@cfg {Function} uploadWith
 
-A function to upload files with. Will be given to
-the internal {@link Cs.file.data.FileUploader} instance
-and must have the same signature as specified for that
-object's {@link Cs.file.data.FileUploader#uploadWith} method.
+A function to prepare requests before a given file is uploaded. Will
+be given to the internal {@link Cs.file.data.FileUploader} instance
+and must have the same signature as specified for that object's {@link
+Cs.file.data.FileUploader#uploadWith} method.
 
 If not given, then this object will use the 
 {@link Cs.file.data.FileUploader#upload} method.
@@ -65,8 +65,7 @@ will always be used, but otherwise any config can be given.
 */
   constructor: function(config) {
     config = Ext.apply(config, { 
-      layout: Ext.create('Ext.layout.container.VBox', {align: 'stretch'}),
-      height: &quot;100%&quot;
+      layout: Ext.create('Ext.layout.container.Anchor')
     });
 
     this.initConfig(config);
@@ -79,8 +78,10 @@ will always be used, but otherwise any config can be given.
     uploadCmpDef = {
       xtype: 'container',
       height: 28,
+      anchor: &quot;100%&quot;,
       padding: &quot;3 0 0 0&quot;,
       layout: {type: 'hbox', pack: 'end' },
+      itemId: &quot;upload&quot;,
       items: {
         xtype: 'button',
         text: 'Upload',
@@ -166,7 +167,7 @@ will always be used, but otherwise any config can be given.
       fileCmp,
       fileCmpDef = {
         xtype: 'filefield',
-        width: &quot;100%&quot;,
+        anchor: &quot;100%&quot;,
         height: 30,
         buttonText: &quot;Add a File ... &quot;,
         multiple: true,
@@ -229,13 +230,17 @@ will always be used, but otherwise any config can be given.
         }, false);
       }
 
-      listCmp = me.add({
-            xtype: 'container',
-            flex: 1,
-            layout: 'anchor',
-            autoScroll: true
-        });
-      uploadCmp = me.add(uploadCmpDef);
+      me.add([{
+        xtype: 'container',
+        flex: 1,
+        layout: 'anchor',
+        autoScroll: true,
+        itemId: &quot;filelist&quot;
+      }, uploadCmpDef]);
+
+      listCmp = me.child(&quot;#filelist&quot;);
+      uploadCmp = me.child(&quot;#upload&quot;);
+
     });
   }
 });</pre>
