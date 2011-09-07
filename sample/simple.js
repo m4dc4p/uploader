@@ -1,6 +1,6 @@
 Ext.Loader.setConfig({
   enabled: true,
-  paths: {'Cs': 'src'},
+  paths: {'Cs': '../src'},
   disableCaching: false
 });
 
@@ -33,7 +33,7 @@ Ext.onReady(function() {
       }
     }, { 
       xtype: 'simplefileuploader',
-      url: 'upload.php',
+      url: 'upload.html',
       padding: 5,
       uploadWith: function(file, req) {
 

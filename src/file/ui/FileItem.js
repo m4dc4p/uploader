@@ -1,7 +1,6 @@
 Ext.require([
   'Ext.container.Container',
-  'Ext.ProgressBar',
-
+  'Ext.ProgressBar'
 ]);
 
 /**
