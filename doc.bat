@@ -1,1 +1,0 @@
-c:\Users\baileyj\Programs\jsduck-2.0.pre4.exe -o doc --external=Ext.util.Observable --external=Ext.data.Connection simple.js ugly.js src
