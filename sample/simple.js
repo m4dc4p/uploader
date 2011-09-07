@@ -15,7 +15,7 @@ Ext.onReady(function() {
   form;
 
   root = Ext.create('Ext.container.Container', {
-    renderTo: Ext.getBody(),
+    renderTo: Ext.get('uploader'),
     layout: { type: 'vbox', align: 'stretch' },
     width: 600,
     height: 300,
