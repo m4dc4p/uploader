@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+</head>
+<body>
+<h1 id="file-uploader-httpuploader.codeslower.com"
+>File Uploader (<a href="http://uploader.codeslower.com"
+  >http://uploader.codeslower.com</a
+  >)</h1
+><p
+>This project implements client-side file uploading for modern browsers. When supported, upload progress can be tracked and reported to the user. It also demonstrates how to implement drag-and-drop file selection (again, when supported by the browser).</p
+><p
+>The project contains a demonstration UI, called SimpleFileUploader, but that UI really just shows how to use the data abstractions provided. I did not intend SimpleFileUploader to work as anything more than sample code; but I did intend that the classes used to implement SimpleFileUploader provided a robust and scalable solution for uploading files from the client.</p
+><p
+>File Uploader uses the <a href="http://www.sencha.com"
+  >ExtJS 4.0</a
+  > framework to define classes, manage files, and implement asynchronous uploading. The SimpleFileUploader sample uses the ExtJS Component classes to implement its UI. File uploads via the <code
+  >file</code
+  > input element require the ExtJS <a href="http://docs.sencha.com/ext-js/4-0/#!/api/Ext.form.field.File"
+  ><code
+    >Ext.form.field.File</code
+    ></a
+  > component. Otherwise, File Uploader does not require that the UI be implemented with ExtJS.</p
+><h1 id="documentation"
+>Documentation</h1
+><p
+>Documentation generated using <a href="https://github.com/senchalabs/jsduck/"
+  >jsduck</a
+  > can be found at <a href="http://uploader.codeslower.com/doc"
+  >http://uploader.codeslower.com/doc</a
+  >.</p
+><h1 id="sample"
+>Sample</h1
+><p
+>A sample page using the <code
+  >SimpleFileUploader</code
+  > can be found at <a href="http://uploader.codeslower.com/sample"
+  >http://uploader.codeslower.com/sample</a
+  >.</p
+><h1 id="source-repository"
+>Source Repository</h1
+><p
+>The source code for the File Uploader can be found on GitHub at <a href="https://github.com/m4dc4p/uploader"
+  >https://github.com/m4dc4p/uploader</a
+  >.</p
+><h1 id="license"
+>License</h1
+><p
+>File Uploader has been released under the BSD3 license. See the LICENSE file in the source repository for details.</p
+><h1 id="source-code-and-components"
+>Source Code and Components</h1
+><p
+>The <code
+  >src</code
+  > directory contains the source files for the project. File Uploader divides classes into two namespaces, <code
+  >Cs.file.data</code
+  > and <code
+  >Cs.file.ui</code
+  >, each found under the appropriate directory. The <code
+  >sample</code
+  > directory shows how to use the SimpleFileUploader component.</p
+><h2 id="sample-1"
+><code
+  >sample/</code
+  ></h2
+><ul
+><li
+  >index.html - Hosts the sample.</li
+  ><li
+  >simple.js - Shows how to instantiate the SimpleFileUploader component. The page always uploads to &quot;upload.html.&quot;</li
+  ><li
+  >upload.html - Contains canned JSON indicating that the upload succeeded.</li
+  ><li
+  >ugly.js - A deprecated sample showing how to host the UglyFileUploader.</li
+  ></ul
+><h2 id="srcfiledata"
+><code
+  >src/file/data/</code
+  ></h2
+><p
+>Classes in this directory implement file management, uploads, and progress notification. Classes provided include:</p
+><ul
+><li
+  ><p
+    ><code
+      >Cs.file.data.File</code
+      > - An <a href="http://docs.sencha.com/ext-js/4-0/#!/api/Ext.data.Model"
+      ><code
+	>Ext.data.Model</code
+	></a
+      > subclass that represents an individual file.</p
+    ></li
+  ><li
+  ><p
+    ><code
+      >Cs.file.data.FileManager</code
+      > - Manages a list of Cs.file.data.File instances. This class provides methods for adding, removing and enumerating files.</p
+    ></li
+  ><li
+  ><p
+    ><code
+      >Cs.file.data.FileUploader</code
+      > - Handles uploading files managed by a <code
+      >Cs.file.data.FileManager</code
+      > instance. This class can upload files using form submission (i.e., from the <a href="http://docs.sencha.com/ext-js/4-0/#!/api/Ext.form.field.File"
+      ><code
+	>Ext.form.field.File</code
+	></a
+      > component) or the <code
+      >File</code
+      > object as defined by the <a href="http://www.w3.org/TR/FileAPI/"
+      >W3C's FileAPI</a
+      >. On supported browsers, the class will report progress and can cancel uploads in progress.</p
+    ></li
+  ><li
+  ><p
+    ><code
+      >Cs.file.data.ConnectionEx</code
+      > - Extends the ExtJS <a href="http://docs.sencha.com/ext-js/4-0/#!/api/Ext.data.Connection"
+      ><code
+	>Ext.data.Connection</code
+	></a
+      > class by adding support for progress notifications.</p
+    ></li
+  ></ul
+><h2 id="srcfileui"
+><code
+  >src/file/ui/</code
+  ></h2
+><p
+>This directory gives a sample UI for managing file uploads. <code
+  >UglyFileUploader</code
+  > represents an early UI and no longer works.</p
+><ul
+><li
+  ><code
+    >Cs.file.ui.FileItem</code
+    > - A <a href="http://docs.sencha.com/ext-js/4-0/#!/api/Ext.Template"
+    ><code
+      >Ext.Template</code
+      ></a
+    >-based UI component representing a single file. Shows upload progress and provides controls to cancel the upload.<br
+     /></li
+  ><li
+  ><code
+    >Cs.file.ui.SimpleFileUploader</code
+    > - Allows files to be selected via a traditional file picker (using the <a href="http://docs.sencha.com/ext-js/4-0/#!/api/Ext.form.field.File"
+    ><code
+      >Ext.form.field.File</code
+      ></a
+    > component) or by drag-and-drop. Each file added can be uploaded to the server.</li
+  ><li
+  ><code
+    >Cs.file.ui.UglyFileUploader</code
+    > - A deprecated, no longer working, class showing an earlier UI for uploading files.</li
+  ></ul
+>
+</body>
+</html>
