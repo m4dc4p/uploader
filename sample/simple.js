@@ -33,7 +33,7 @@ Ext.onReady(function() {
       }
     }, { 
       xtype: 'simplefileuploader',
-      url: 'upload.php',
+      url: 'upload.html',
       padding: 5,
       uploadWith: function(file, req) {
 
