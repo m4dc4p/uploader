@@ -3,9 +3,11 @@ Manages uploading files in a {@link Cs.file.data.FileManager} from the
 browser. 
 
 If the file has type {@link Cs.file.data.File#FILE}, then the data
-will be POSTed to the server under the parameter name "data", as a
-binary string, where each character represents an 8-bit byte (e.g.,
-from 0 - 255).
+will be POSTed to the server in the body of a POST request, where each
+character represents an 8-bit byte (e.g.,
+from 0 - 255). Any additional parameters need to be specified in the
+{@link url} configuration property (unless the {@link uploadWith} function
+is used to modify the request).
 
 Otherwise, when the file has type {@link Cs.file.data.File#FORM}, it
 will be encoded using as a multipart form and POSTed. The file input
@@ -24,8 +26,8 @@ form uploads, the same-origin restriction still applies.
 /**
 @cfg {Function}
 
-A function to call when a file is successfully uploaded. The function should take the following
-parameters:
+A function to call when a file is successfully uploaded. The function
+should take the following parameters:
 
 - **file** : {@link Cs.file.data.File}. The file that was 
 uploaded.
@@ -44,9 +46,10 @@ method. Will be nearly the same as request object returned from the
 /**
 @cfg {Function}
 
-A function to call while the upload proceeds. This config only has an effect when the
-underlying connection supports it. As of August 2011, that is Firefox and Chrome, using
-files with type {@link Cs.file.data.File#FILE}.
+A function to call while the upload proceeds. This config only has an
+effect when the underlying connection supports it. As of August 2011,
+that is Firefox and Chrome, using files with type {@link
+Cs.file.data.File#FILE}.
 
 More about progress events can be found in the [W3C draft
 spec](http://www.w3.org/TR/progress-events/) and on the [Mozilla
@@ -123,7 +126,7 @@ Configuration parameters.
 */
   constructor: function (fileMgr, config) {
     var me = this,
-    uploads = {};
+    uploads = {},
     uploadAs = function(prepRequest) {
       var reqs = [];
 
@@ -167,7 +170,8 @@ Configuration parameters.
           progress: req.progress,
           success: req.success,
           failure: req.failure,
-          callback: req.callback
+          callback: req.callback,
+          chunkReq: req.chunkReq
         },
         progress = function(info) {
           orig.progress(file, info.total, info.amt, info.evt);
@@ -197,34 +201,98 @@ Configuration parameters.
             orig.callback(file, options, success, response);
         };
         
-        if(file.get('type') == Cs.file.data.File.FILE) {
-          // Undocumented options property "rawData" can be used
-          // to pass our File object through the request.
-          uploads[file.getId()] = conn.request(Ext.apply(req, { rawData: file.raw }));
+        if(orig.chunkReq && file.get('type') == Cs.file.data.File.FILE) {
+          chunkedUpload(file.getId(), req, orig);
         }
-        else if(file.get('type') == Cs.file.data.File.FORM) {
-          form = Ext.DomQuery.selectNode("form", Ext.create('Ext.container.Container', {
-            html: {
-              tag: "form",
-              action: req.url,
-              method: "POST"
-            },
-            hidden: true,
-            renderTo: Ext.getBody()
-          }).getEl().dom);
+        else {
+          if(file.get('type') == Cs.file.data.File.FILE) {
+            // Undocumented options property "rawData" can be used
+            // to pass our File object through the request.
+            uploads[file.getId()] = conn.request(Ext.apply(req, { rawData: file.raw }));
+          }
+          else if(file.get('type') == Cs.file.data.File.FORM) {
+            form = Ext.DomQuery.selectNode("form", Ext.create('Ext.container.Container', {
+              html: {
+                tag: "form",
+                action: req.url,
+                method: "POST"
+              },
+              hidden: true,
+              renderTo: Ext.getBody()
+            }).getEl().dom);
 
-          form.appendChild(file.raw.getEl().dom);
+            form.appendChild(file.raw.getEl().dom);
 
-          // All these contortions necessary to create a form and
-          // get hold of the DOM element, which conn.upload requires.
-          conn.upload(form,
-                      req.url, 
-                      req.params ? Ext.Object.toQueryString(req.params) : null, 
-                      req);
+            // All these contortions necessary to create a form and
+            // get hold of the DOM element, which conn.upload requires.
+            conn.upload(form,
+                        req.url, 
+                        req.params ? Ext.Object.toQueryString(req.params) : null, 
+                        req);
+          }
         }
       });
 
       reqs = [];
+    }, 
+    // Manages uploading a file in chunks, rather than all at once.
+    chunkedUpload = function (fileId, origReq, origFn) {
+      // Upload a single chunk using options in req and chunkReq.
+      // data holds the file data to upload.
+      var uploadChunk = function (chunkReq, data, req) { 
+        // Undocumented options property "rawData" can be used
+        // to pass our File object through the request.
+        uploads[fileId] = conn.request(Ext.apply(req, chunkReq, { rawData: data }));
+      },
+      // Initiates a chunk upload if any data remains. Looks
+      // at the chunkReq provided and, if it is falsey, assumes
+      // the client wants to stop uploading (or has no more data)
+      // and calls appropriate callbacks. If all uploads were successful,
+      // the file will be commited() in the manager. Otherwise, it 
+      // remains dirty.
+      //
+      // When uploading in chunks, the callbacks give back the data provided
+      // for upload (i.e., not a complete file - a Blob instead). After 
+      // chunkReq returns falsey, the final callbacks are called using
+      // the last response from the server and last options provided. That
+      // means they can be duplicates or null, depending on how many chunks
+      // got uploaded (all or none). 
+      doChunk = function(req, chunkReq, lastResponse, lastOptions) {
+        var data = chunkReq && chunkReq["data"];
+        
+        if(! data) {
+          req.success = function(response, options) {
+            if(origFn.success)
+              origFn.success(data, response, options);
+        
+            doChunk(Ext.clone(req), origFn.chunkReq(), response, options);
+          };
+
+          req.failure = function(response, options) {
+            if(origFn.failure)
+              origFn.failure(data, response, options);
+        
+            success = false;
+            doChunk(Ext.clone(req), origFn.chunkReq(), response, options);
+          };
+
+          if(origFn.callback)
+            req.callback = origFn.callback;
+          
+          uploadChunk(chunkReq, chunkReq.data, req);
+        }
+        else {
+          origReq.callback(lastOptions, success, lastResponse);
+
+          if(success)
+            origReq.success(lastResponse, lastOptions);
+          else
+            origReq.failure(lastResponse, lastOptions);
+        }
+      },
+      success = true;
+
+      doChunk(Ext.clone(origReq), origFn.chunkReq(), null, null);
     };
 
     this.initConfig(config);
@@ -256,11 +324,15 @@ following signature:
 
 - **file** : {@link Cs.file.data.File}. The file that will be uploaded.
 
-- **request** : `Object`. A request configuration object, using the same
-values as given to the [`request`](http://docs.sencha.com/ext-js/4-0/#/api/Ext.data.Connection-method-request)
-method on the [`Ext.data.Connection`](http://docs.sencha.com/ext-js/4-0/#/api/Ext.data.Connection) object. This
-object will contain all the configuration parameters given when this {@link Cs.file.data.FileUploader} was constructed. Note that
-the file data will NOT be added to the request object yet.
+- **request** : `Object`. A request configuration object, using the
+same values as given to the
+[`request`](http://docs.sencha.com/ext-js/4-0/#/api/Ext.data.Connection-method-request)
+method on the
+[`Ext.data.Connection`](http://docs.sencha.com/ext-js/4-0/#/api/Ext.data.Connection)
+object. This object will contain all the configuration parameters
+given when this {@link Cs.file.data.FileUploader} was
+constructed. Note that the file data will NOT be added to the request
+object yet.
 
 The `prepRequest` function must return a request object, which will be
 used to configure the upload process. Normally `prepRequest` should
@@ -274,7 +346,7 @@ If the file has type {@link Cs.file.data.File#FILE}, then the data
 will be POSTed to the server as a 
 binary string, where each character represents an 8-bit byte (e.g.,
 from 0 - 255). The body of the request will contain the file data. Any
-additional parameters will be appenended to the URL used to POST.
+additional parameters will be appended to the URL used to POST.
 
 Otherwise, when the file has type {@link Cs.file.data.File#FORM}, it
 will be encoded using as a multipart form and POSTed. The file input
