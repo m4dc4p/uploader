@@ -27,7 +27,8 @@ Ext.onReady(function() {
       width: '100%',
       items: {
         xtype: 'textfield',
-        fieldLabel: 'Your Name',
+        fieldLabel: 'Your Name (required)',
+        labelWidth: 150,
         name: 'name',
         allowBlank: false
       }

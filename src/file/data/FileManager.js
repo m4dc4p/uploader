@@ -76,7 +76,8 @@ or a [Ext.form.field.File](http://docs.sencha.com/ext-js/4-0/#/api/Ext.form.fiel
       Ext.Array.each(fs.add({raw: file}), 
                      afterCreate);
       
-      console.log("added: " + file.name);
+      if(window['console'])
+        console.log("added: " + file.name);
       me.fireEvent('fileadded', fileRec);
       return fileRec;
     };
