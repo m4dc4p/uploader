@@ -145,7 +145,7 @@ will always be used, but otherwise any config can be given.
       }}));
 
     this.on('afterrender', function(c, opt) {
-      var myEl = me.getEl(),
+      var containerEl = me.container,
       msgCmp,
       fileCmp,
       fileCmpDef = {
@@ -166,6 +166,19 @@ will always be used, but otherwise any config can be given.
             fileCmp = me.insert(0, fileCmpDef);
           }
         }
+      },
+      showMsg = function(show) {
+        if(show && ! msgCmp.isVisible()) {
+          me.ownerCt.getEl().setStyle("border", "2px solid red");
+          msgCmp.setVisible(true);
+          msgCmp.updateBox(fileCmp.getBox(true));
+          fileCmp.setVisible(false);
+        }
+        else if(! show && msgCmp.isVisible()) {
+          me.ownerCt.getEl().setStyle("border", "0px solid red");
+          fileCmp.setVisible(true);
+          msgCmp.setVisible(false);
+        }
       };
 
       fileCmp = me.add(fileCmpDef);
@@ -173,7 +186,9 @@ will always be used, but otherwise any config can be given.
       if(Cs.file.data.FileManager.supportsFile) {
         msgCmp = me.add({
           xtype: 'container',
-          cls: 'droppable-region',
+          style: {"font-weight": "bold", 
+                  "color": "red",
+                  "text-align": "center" },
           html: "Drop Files Here",
           width: '100%',
           height: 25,
@@ -181,48 +196,52 @@ will always be used, but otherwise any config can be given.
           hidden: true
         });
 
-        myEl.dom.addEventListener("dragenter", function (evt) {
-          if(! msgCmp.isVisible()) {
-            msgCmp.setVisible(true);
-            msgCmp.updateBox(fileCmp.getBox(true));
-            fileCmp.setVisible(false);
-          }
-
+        containerEl.dom.addEventListener("dragenter", function (evt) {
+          showMsg(true);
           return false;
         }, false);
 
-        myEl.dom.addEventListener("dragover", function (evt) {
+        containerEl.dom.addEventListener("dragover", function (evt) {
           evt.stopPropagation();
           evt.preventDefault();
 
           return false;
         }, false);
 
-        myEl.dom.addEventListener("drop", function (evt) {
+        containerEl.dom.addEventListener("dragleave", function(evt) {
+          evt.stopPropagation();
+          evt.preventDefault();
+
+          showMsg(false);
+
+          return false;
+        }, false);
+
+        containerEl.dom.addEventListener("drop", function (evt) {
           
           evt.stopPropagation();
           evt.preventDefault(); 
-          
-          fileCmp.setVisible(true);
-          msgCmp.setVisible(false);
+
+          showMsg(false);
 
           Ext.Array.each(evt.dataTransfer.files, function(file) { 
             fileMgr.addFile(file);
           });
 
         }, false);
+
       }
 
       me.add([{
         xtype: 'container',
         flex: 1,
         layout: 'anchor',
-        autoScroll: true,
         itemId: "filelist"
       }, uploadCmpDef]);
 
       listCmp = me.child("#filelist");
       uploadCmp = me.child("#upload");
+      me.doLayout();
 
     });
   }
