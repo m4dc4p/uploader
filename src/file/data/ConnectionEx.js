@@ -67,7 +67,9 @@
 
           if(xhr.upload)
             xhr.upload.addEventListener('progress', function (evt) {
-              console.log("xhr.upload.progress");
+              if(window['console'])
+                console.log("xhr.upload.progress");
+
               me.fireEvent('progress', { 
                 dir: 'up',
                 amt: evt.loaded,
@@ -78,7 +80,9 @@
 
           if(xhr.onprogress)
             xhr.addEventListener('progress', function (evt) {
-              console.log("xhr.progress");
+              if(window['console'])
+                console.log("xhr.progress");
+
               me.fireEvent('progress', { 
                 dir: 'down',
                 amt: evt.loaded,
