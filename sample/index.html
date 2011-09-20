@@ -17,18 +17,26 @@
   <body>
     <div style="margin:5px">
       <div style="width: 600px">
-        <p>In most browsers, you can drag and drop files from your computer
-          onto the form below. Enter your name and click "Upload" to
-          watch the progress bar.<br><br>
-          
+        <div id='uploader'></div><br><br>
+
+        <p>In most browsers, you can drag and drop files from your
+          computer onto the form above. Enter your name and click
+          "Upload" to watch the progress bar. Don't worry, no files
+          are actually captured on the server - they just disappear
+          into space. <br><br>
+        
+        <p>I suggest adding large files (> 1 MB) or they tend to
+          upload too quickly and you can't see the progress
+          notification. <br><br>
+
         <p>If you add too many files, the upload button will scroll off
           the bottom of the list. Don't do that.<br><br>
           
-        <p>Unfortunately, only the IE 10 supports drag and drop or progress
-          notifications, so the demo isn't nearly as cool. 
+        <p>Internet Explorer (except version 10) does not support drag
+          and drop or progress notifications. You can still add files one
+          at a time with the file picker, but you won't see a nice progress
+          bar as they upload.
       </div><br><br>
-      
-      <div id='uploader'></div>
     </div>
   </body>
 </html>
