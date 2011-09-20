@@ -19,16 +19,20 @@ Ext.define('Cs.file.ui.UglyFileUploader', {
     uploader = Ext.create('Cs.file.data.FileUploader', fileMgr, {
       url: "upload.php",
       progress: function(file, total, amt, evt) { 
-        console.log("Uploaded " + Ext.Number.toFixed(100 * amt / total, 2) + " of " + file.get('name'));
+        if(window['console'])
+          console.log("Uploaded " + Ext.Number.toFixed(100 * amt / total, 2) + " of " + file.get('name'));
       },  
       success: function(file, response, options) { 
-        console.log("Successfully uploaded " + file.get('name'));
+        if(window['console'])
+          console.log("Successfully uploaded " + file.get('name'));
       },
       failure: function(file, response, options) {
-        console.log("Failed to upload " + file.get('name'));
+        if(window['console'])
+          console.log("Failed to upload " + file.get('name'));
       },
       callback: function(file, options, success, response) {
-        console.log("Callback for " + file.get('name'));
+        if(window['console'])
+          console.log("Callback for " + file.get('name'));
       }});
 
     this.initConfig(config);
