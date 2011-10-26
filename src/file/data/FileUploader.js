@@ -185,7 +185,7 @@ Configuration parameters.
         
         req.failure = function(response, options) {
           if(orig.failure)
-            orig.failure(file, response, options)
+            orig.failure(file, response, options);
         };
         
         req.callback = function(options, success, response) {

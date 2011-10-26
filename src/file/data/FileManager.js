@@ -114,7 +114,7 @@ not provided.
       fs.each(function(record) { 
         return fn.call(scope || me, record);
       });
-    }
+    };
   }
 });
 
