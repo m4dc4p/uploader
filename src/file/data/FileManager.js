@@ -38,6 +38,11 @@ Indicates if the browser supports the
       model: 'Cs.file.data.File'
     });
 
+    // Ext 4.1.1. compatability
+    if (!me.hasListeners) {
+        me.hasListeners = new me.HasListeners();
+    }
+    
     me.addEvents(
       /**
 Fired when a file is added to the manager. 
